@@ -3,6 +3,7 @@ import itertools
 import numpy as np
 from tqdm import tqdm
 import funcs.risk as risk
+import streamlit as st
 
 
 """
@@ -15,6 +16,7 @@ ex) get_all_combinations(data=raw_data, 1,3)
 
 return: 속성 조합의 list
 """
+@st.cache(show_spinner=False,suppress_st_warning=True)
 def get_all_combinations(data, Priority, start_dim=1,end_dim=-1):
     all_combinations = list()
     if(start_dim == -1):
@@ -61,6 +63,7 @@ K:          임계치
 start_dim:  속성 조합 시작 dimension (get_all_combinations 함수에 설명 있음)
 end_dim:    속성 조합 끝 dimension   (get_all_combinations 함수에 설명 있음)
 """
+@st.cache(show_spinner=False,suppress_st_warning=True)
 def raw_reidentified_datas(raw_data, K=-1, start_dim=1, end_dim=-1 ):
     #=============원본 재식별 위험도=============
     single_attr, one_attr, record, table = risk.compute_risk(raw_data.copy())
