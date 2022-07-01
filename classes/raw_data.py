@@ -5,6 +5,8 @@ import time
 
 #functions
 from funcs.raw_reidentified import get_all_combinations
+from funcs.risk import compute_risk
+from funcs.utility import convert_df2csv
 
 class raw_data:
     def __init__(self):
@@ -34,45 +36,44 @@ class raw_data:
                         "원본데이터 재식별 위험도",
                         ('원본데이터 테이블 재식별 위험도', '원본데이터 레코드 재식별 위험도', '원본데이터 속성 재식별 위험도','원본데이터 속성 값 재식별 위험도'))
                 if((raw_data_file is not None)):
-                    st.session_state.raw_single_attr_value_risk = single_attr_value_risk(st.session_state.raw_data.copy())
-                    st.session_state.raw_one_attr_risk_table = one_attr_risk_table(st.session_state.raw_single_attr_value_risk.copy())
-                    st.session_state.raw_record_risk = record_risk(st.session_state.raw_data.copy())
-                    st.session_state.raw_table_risk = table_risk(st.session_state.raw_record_risk)
+                    st.session_state.raw_single_attr, st.session_state.raw_one_attr, st.session_state.raw_record, st.session_state.raw_table \
+                        = compute_risk(st.session_state.raw_data)
                     if(risk_kinds == '원본데이터 테이블 재식별 위험도'):
                         risk_title.subheader('원본데이터 테이블 재식별 위험도')
-                        risk_expander_col2.bar_chart(st.session_state.raw_table_risk)
-                        risk_expander_col1.dataframe(st.session_state.raw_table_risk.round(decimals = 4))
+                        risk_expander_col2.bar_chart(st.session_state.raw_table)
+                        risk_expander_col1.dataframe(st.session_state.raw_table.round(decimals = 4))
                         risk_expander_col1.download_button(
                             label="테이블 재식별 위험도 csv로 저장",
-                            data = convert_df(st.session_state.raw_table_risk),
+                            data = convert_df2csv(st.session_state.raw_table),
                             file_name='테이블 재식별 위험도.csv',
                             mime='text/csv',
                         )
                     elif(risk_kinds == '원본데이터 레코드 재식별 위험도'):
                         risk_title.subheader('원본데이터 레코드 재식별 위험도')
-                        risk_expander_col1.dataframe(st.session_state.raw_record_risk.round(decimals = 4))
+                        risk_expander_col1.dataframe(st.session_state.raw_record.round(decimals = 4))
                         risk_expander_col1.download_button(
                             label="레코드 재식별 위험도 csv로 저장",
-                            data = convert_df(st.session_state.raw_record_risk),
+                            data = convert_df2csv(st.session_state.raw_record),
                             file_name='레코드 재식별 위험도.csv',
                             mime='text/csv',
                         )
                     elif(risk_kinds == '원본데이터 속성 재식별 위험도'):
                         risk_title.subheader('원본데이터 속성 재식별 위험도')
-                        risk_expander_col2.bar_chart(st.session_state.raw_one_attr_risk_table.round(decimals = 4))
-                        risk_expander_col1.dataframe(st.session_state.raw_one_attr_risk_table.round(decimals = 4))
+                        risk_expander_col2.bar_chart(st.session_state.raw_one_attr.round(decimals = 4))
+                        risk_expander_col1.dataframe(st.session_state.raw_one_attr.round(decimals = 4))
                         risk_expander_col1.download_button(
                             label="속성 재식별 위험도 csv로 저장",
-                            data = convert_df(st.session_state.raw_one_attr_risk_table),
+                            data = convert_df2csv(st.session_state.raw_one_attr),
                             file_name='속성 재식별 위험도.csv',
                             mime='text/csv',
                         )
                     elif(risk_kinds == '원본데이터 속성 값 재식별 위험도'):
                         risk_title.subheader('원본데이터 속성값 재식별 위험도')
-                        risk_expander_col1.dataframe(st.session_state.raw_single_attr_value_risk)
+                        st.session_state.raw_single_attr = st.session_state.raw_single_attr.round(3)
+                        risk_expander_col1.dataframe(st.session_state.raw_single_attr.astype(str))
                         risk_expander_col1.download_button(
                             label="속성 값 재식별 위험도 csv로 저장",
-                            data = convert_df(st.session_state.raw_single_attr_value_risk),
+                            data = convert_df2csv(st.session_state.raw_single_attr),
                             file_name='속성 값 재식별 위험도.csv',
                             mime='text/csv',
                         )
