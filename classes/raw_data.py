@@ -1,7 +1,9 @@
 #modules
 import streamlit as st
 import pandas as pd
-import time
+import matplotlib.pyplot as plt
+import numpy as np
+from io import BytesIO
 
 #functions
 from funcs.raw_reidentified import get_all_combinations
@@ -39,8 +41,20 @@ class raw_data:
                     file_name='테이블 재식별 위험도.csv',
                     mime='text/csv',
                 )
-                st.dataframe(st.session_state.raw_table.round(decimals = 4))
-                st.line_chart(st.session_state.raw_table)
+                col1, col2 = st.columns(2)
+                col1.dataframe(st.session_state.raw_table.round(decimals = 4))
+                fig, ax = plt.subplots(figsize=(4,4))
+                means = st.session_state.raw_table.iloc[0].iat[0]
+                mins = st.session_state.raw_table.iloc[0].iat[3]
+                maxes = st.session_state.raw_table.iloc[0].iat[2]
+                std = st.session_state.raw_table.iloc[0].iat[1]
+
+                ax.errorbar('Table Reidentification Risk', means, yerr=std, fmt='8r', markersize=10, ecolor='tab:blue', lw=10)
+                ax.errorbar('Table Reidentification Risk', means, yerr=[[means-mins],[maxes-means]],
+                            fmt='_r', ecolor='tab:orange', lw=3, capsize=3)
+                buf = BytesIO()
+                fig.savefig(buf, format="png")
+                col2.image(buf)
                 
 
             with st.expander("원본데이터 레코드 재식별 위험도"):
@@ -50,8 +64,7 @@ class raw_data:
                     file_name='레코드 재식별 위험도.csv',
                     mime='text/csv',
                 )
-                st.subheader('원본데이터 레코드 재식별 위험도')
-                st.table(st.session_state.raw_record.round(decimals = 4))
+                st.dataframe(st.session_state.raw_record.round(decimals = 4))
                 
 
             with st.expander('원본데이터 속성 재식별 위험도'):
@@ -62,8 +75,20 @@ class raw_data:
                     mime='text/csv',
                 )
                 st.subheader('원본데이터 속성 재식별 위험도')
-                st.bar_chart(st.session_state.raw_one_attr.round(decimals = 4))
+                # st.bar_chart(st.session_state.raw_one_attr.round(decimals = 4))
                 st.dataframe(st.session_state.raw_one_attr.round(decimals = 4))
+                fig, ax = plt.subplots(figsize=(12,4))
+                means = st.session_state.raw_one_attr['mean']
+                mins = st.session_state.raw_one_attr['min']
+                maxes = st.session_state.raw_one_attr['max']
+                std = st.session_state.raw_one_attr['std']
+                errors = pd.concat([means-mins,maxes-means], axis=1)
+                ax.errorbar(st.session_state.raw_one_attr.index, means, yerr=std, fmt='8r', markersize=10, ecolor='tab:blue', lw=10)
+                ax.errorbar(st.session_state.raw_one_attr.index, means, yerr=errors.T,
+                            fmt='_r', ecolor='tab:orange', lw=3, capsize=3)
+                buf = BytesIO()
+                fig.savefig(buf, format="png")
+                st.image(buf)
                 
 
             with st.expander('원본데이터 속성 값 재식별 위험도'):
@@ -74,5 +99,5 @@ class raw_data:
                     mime='text/csv',
                 )
                 st.session_state.raw_single_attr = st.session_state.raw_single_attr.round(4)
-                st.table(st.session_state.raw_single_attr.astype(str))
+                st.dataframe(st.session_state.raw_single_attr.astype(str))
                 
