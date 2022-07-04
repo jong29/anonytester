@@ -5,7 +5,10 @@ import numpy as np
 import itertools
 from tqdm import tqdm
 
+import streamlit as st
+
 #속성값 재식별 위험도
+@st.cache(show_spinner=False,suppress_st_warning=True)
 def single_attr_value_risk(dataframe):
     dataframe_cols = list(dataframe.columns)
     one_attr_value_risk_table = pd.DataFrame(columns=['속성','속성 값','counts'])
@@ -21,7 +24,7 @@ def single_attr_value_risk(dataframe):
     one_attr_value_risk_table = one_attr_value_risk_table.sort_values(['속성','속성 값 재식별 위험도'],ascending=False).reset_index(drop=True)
     return one_attr_value_risk_table
 
-
+@st.cache(show_spinner=False,suppress_st_warning=True)
 def one_attr_risk(single_attr_value_risk):
     # single_attr_value_risk['속성 값 재식별 위험도'] = single_attr_value_risk['속성 값 재식별 위험도'].astype(int)
     one_attr_risk_table = single_attr_value_risk.pivot_table(index='속성',\
@@ -31,13 +34,14 @@ def one_attr_risk(single_attr_value_risk):
     one_attr_risk_table = one_attr_risk_table.sort_values('mean',ascending=False)
     return one_attr_risk_table
 
-
+@st.cache(show_spinner=False,suppress_st_warning=True)
 def transform_to_risk(raw_data,col_name):
     temp = pd.DataFrame()
     temp[col_name] = (1-(raw_data[col_name].value_counts()-1)/(len(raw_data)-1))
     temp = temp.to_dict()
     return temp[col_name]
 
+@st.cache(show_spinner=False,suppress_st_warning=True)
 def record_risk(risk_data):
     record_risk = pd.DataFrame()
     raw_data_cols = list(risk_data.columns)
@@ -51,12 +55,14 @@ def record_risk(risk_data):
     record_risk = record_risk.sort_values('레코드 평균 위험도',ascending=False).reset_index().rename(columns={'index':'기존 레코드 행 번호'})
     return record_risk
 
+@st.cache(show_spinner=False,suppress_st_warning=True)
 def table_risk(record_risk):
     table_risk = pd.DataFrame(record_risk['레코드 평균 위험도'].describe()).T
     table_risk = table_risk[['mean','std','max','min']]
     table_risk = table_risk.rename(index={"레코드 평균 위험도":"테이블 재식별 위험도"})
     return table_risk 
 
+@st.cache(show_spinner=False,suppress_st_warning=True)
 def compute_risk(dataframe):
     single_attr = single_attr_value_risk(dataframe)
     one_attr = one_attr_risk(single_attr)
