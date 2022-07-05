@@ -3,15 +3,38 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
+import time
 
 #functions
 from funcs.risk import compute_risk
 from funcs.utility import convert_df2csv
+from funcs.raw_reidentified import raw_reidentified_datas
+from funcs.preprocessing import preprocessing_raw
 
 class raw_data:
     def __init__(self):
         st.markdown("# Raw Data Analysis")
         if st.session_state.raw_data is not None:
+            st.subheader("원본데이터 재식별도")
+            with st.expander("재식별도 계산"):
+                start_cont = st.container()
+                start_button = start_cont.button("재식별도 계산 시작")
+                if start_button:
+                    reidentified_res = st.container()
+                    prep_raw_data = preprocessing_raw(st.session_state.raw_data.copy())
+                    begin = time.time()
+                    raw_reidentified = raw_reidentified_datas(prep_raw_data, K=-1,start_dim=1,end_dim=-1)
+                    reidentified_res.write(f"소요시간: {(time.time()-begin):.2f}초")
+                    reidentified_res.write(raw_reidentified[:1000])
+                    reid_rate = len(raw_reidentified)/len(prep_raw_data)
+                    reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
+                    reidentified_res.download_button(
+                            label="재식별된 데이터 csv로 저장",
+                            data = convert_df2csv(raw_reidentified),
+                            file_name='재식별된 데이터.csv',
+                            mime='text/csv',
+                        )
+
             st.subheader("원본데이터 재식별 위험도")
             st.session_state.raw_single_attr, st.session_state.raw_one_attr, st.session_state.raw_record, st.session_state.raw_table \
                     = compute_risk(st.session_state.raw_data)
@@ -58,7 +81,6 @@ class raw_data:
                     mime='text/csv',
                 )
                 st.subheader('속성 재식별 위험도')
-                # st.bar_chart(st.session_state.raw_one_attr.round(decimals = 4))
                 st.dataframe(st.session_state.raw_one_attr.round(decimals = 4))
                 fig, ax = plt.subplots(figsize=(12,4))
                 means = st.session_state.raw_one_attr['mean']

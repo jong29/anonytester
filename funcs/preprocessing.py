@@ -1,10 +1,7 @@
 import pandas as pd
-import itertools
-import numpy as np
-from tqdm import tqdm
-import risk
 from ast import literal_eval
 from joblib import Parallel, delayed
+import streamlit as st
 
 #====================================원본 전처리=============================
 """
@@ -12,9 +9,8 @@ from joblib import Parallel, delayed
 data_path = 데이터 경로
 drop_cols = 제거할 속성 (키속성 등)
 """
-def preprocessing_raw(data_path, drop_cols):
-    raw_data = pd.read_csv(data_path)
-    raw_data = raw_data.drop(drop_cols,axis=1)
+@st.cache
+def preprocessing_raw(raw_data):
     raw_data = raw_data.reset_index().rename(columns={'index':'abst_row_num__'})
     raw_data['abst_row_num__'] = raw_data['abst_row_num__'] + 1
     raw_data = raw_data.set_index("abst_row_num__")

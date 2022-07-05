@@ -6,7 +6,7 @@ class main_UI:
         st.set_page_config(
             page_title = "Anony Tester",
             layout = "wide"
-        )
+        )   
         SideBar()
         
 if __name__ == '__main__':
