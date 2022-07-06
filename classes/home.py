@@ -18,6 +18,7 @@ class home:
         raw_data_file = col1.file_uploader("Upload Raw Data")
 
         if (raw_data_file is not None) and ("raw_data" not in st.session_state):
+            st.session_state.raw_file_name = str(raw_data_file.name)
             st.session_state.raw_data  = load_data_raw(raw_data_file)
 
         if "raw_data" in st.session_state:
@@ -25,8 +26,9 @@ class home:
                 "제거할 속성을 선택해주세요",
                 list(st.session_state.raw_data.columns))
             st.session_state.raw_data = st.session_state.raw_data.drop(st.session_state.drop_raw,axis=1)
-
+    
             with col1.expander("입력 데이터 확인"):
+                    st.markdown(f"### {st.session_state.raw_file_name}")
                     st.write(st.session_state.drop_raw)
                     st.caption(f"레코드 수: {str(len(st.session_state.raw_data))}\
                         \n속성 수: {str(len(st.session_state.raw_data.columns))}\
@@ -52,13 +54,13 @@ class home:
 
 
 #cache functions
-@st.cache
+@st.cache(show_spinner=False)
 def load_data_raw(file):
     df = pd.read_csv(file, encoding='utf-8')
     df = preprocessing_raw(df)
     return df
 
-@st.cache
+@st.cache(show_spinner=False)
 def load_data_syn(file):
     df = pd.read_csv(file, encoding='utf-8')
     return df 

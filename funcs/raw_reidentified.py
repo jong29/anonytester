@@ -4,6 +4,7 @@ import numpy as np
 from tqdm import tqdm
 import funcs.risk as risk
 import streamlit as st
+from stqdm import stqdm
 
 
 """
@@ -62,8 +63,8 @@ K:          임계치
 start_dim:  속성 조합 시작 dimension (get_all_combinations 함수에 설명 있음)
 end_dim:    속성 조합 끝 dimension   (get_all_combinations 함수에 설명 있음)
 """
-@st.cache
-def raw_reidentified_datas(raw_data, K=-1, start_dim=1, end_dim=-1 ):
+@st.cache(suppress_st_warning=True, show_spinner=False)
+def raw_reidentified_datas(raw_data, K=-1, start_dim=1, end_dim=-1):
     #=============원본 재식별 위험도=============
     single_attr, one_attr, record, table = risk.compute_risk(raw_data.copy())
     Priority = list(one_attr.index)
@@ -78,10 +79,12 @@ def raw_reidentified_datas(raw_data, K=-1, start_dim=1, end_dim=-1 ):
     print("모두 같은 값을 가져 drop된 속성: ", dropped_cols)
     #속성 조합 반환
     combs = get_all_combinations(data, Priority, start_dim, end_dim)
-    print("총: " + str(len(combs)) + " 개의 속성 조합을 검사합니다")
+    temp_comb = st.container()
+    temp_comb.write("총: " + str(len(combs)) + " 개의 속성 조합을 검사합니다")
 
     reidentified_evidence = pd.DataFrame()
-    loop = tqdm(list(combs), total=len(combs), leave=True)
+    # loop = tqdm(list(combs), total=len(combs), leave=True)
+    loop = stqdm(list(combs))
     for comb in loop:
         #특정 속성 조합에서 유일한 데이터 반환
         raw_unique = find_unique_data(data, comb)
@@ -91,4 +94,5 @@ def raw_reidentified_datas(raw_data, K=-1, start_dim=1, end_dim=-1 ):
         if(len(reidentified_evidence) >= K):
             break
     reidentified_evidence = reidentified_evidence.sort_values("abst_row_num__").reset_index(drop=True)
+    del temp_comb
     return reidentified_evidence
