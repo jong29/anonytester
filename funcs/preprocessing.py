@@ -9,7 +9,7 @@ import streamlit as st
 data_path = 데이터 경로
 drop_cols = 제거할 속성 (키속성 등)
 """
-@st.cache
+# @st.cache
 def preprocessing_raw(raw_data):
     raw_data = raw_data.reset_index().rename(columns={'index':'abst_row_num__'})
     raw_data['abst_row_num__'] = raw_data['abst_row_num__'] + 1

@@ -17,7 +17,7 @@ class SideBar:
             raw_data()
         if selected == "Synthetic Data Risk":
             st.title(f"you selected {selected}")
-        if selected == "Synthetic Data Usefulness":
+        if selected == "Synthetic Data Usefulness": 
             st.title(f"you selected {selected}")   
 
         with st.sidebar:

@@ -1,4 +1,5 @@
 #modules
+from tracemalloc import start
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,7 +10,6 @@ import time
 from funcs.risk import compute_risk
 from funcs.utility import convert_df2csv
 from funcs.raw_reidentified import raw_reidentified_datas
-from funcs.preprocessing import preprocessing_raw
 
 class raw_data:
     def __init__(self):
@@ -18,15 +18,19 @@ class raw_data:
             st.subheader("원본데이터 재식별도")
             with st.expander("재식별도 계산"):
                 start_cont = st.container()
-                start_button = start_cont.button("재식별도 계산 시작")
-                if start_button:
+                col1, col2, col3 = start_cont.columns([1, 4, 1])
+                start_button = col1.button("재식별도 계산 시작")
+                values = col2.slider('재식별도 계산 Dimension을 선택하세요',
+                                    1, len(st.session_state.raw_data.columns),(1, len(st.session_state.raw_data.columns)))
+                if "raw_reid_done" not in st.session_state:
+                    st.session_state.raw_reid_done = False
+                if start_button or st.session_state.raw_reid_done:
                     reidentified_res = st.container()
-                    prep_raw_data = preprocessing_raw(st.session_state.raw_data.copy())
                     begin = time.time()
-                    raw_reidentified = raw_reidentified_datas(prep_raw_data, K=-1,start_dim=1,end_dim=-1)
+                    raw_reidentified = raw_reidentified_datas(st.session_state.raw_data, K=-1,start_dim=values[0],end_dim=values[1])
                     reidentified_res.write(f"소요시간: {(time.time()-begin):.2f}초")
                     reidentified_res.write(raw_reidentified[:1000])
-                    reid_rate = len(raw_reidentified)/len(prep_raw_data)
+                    reid_rate = len(raw_reidentified)/len(st.session_state.raw_data)
                     reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
                     reidentified_res.download_button(
                             label="재식별된 데이터 csv로 저장",
@@ -34,10 +38,11 @@ class raw_data:
                             file_name='재식별된 데이터.csv',
                             mime='text/csv',
                         )
+                    st.session_state.raw_reid_done = True
 
             st.subheader("원본데이터 재식별 위험도")
             st.session_state.raw_single_attr, st.session_state.raw_one_attr, st.session_state.raw_record, st.session_state.raw_table \
-                    = compute_risk(st.session_state.raw_data)
+                    = compute_risk(st.session_state.raw_data.copy())
 
             with st.expander("테이블 재식별 위험도"):
                 #속성 값 재식별 위험도

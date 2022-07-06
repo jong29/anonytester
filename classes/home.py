@@ -4,6 +4,7 @@ import pandas as pd
 
 #functions
 from funcs.raw_reidentified import get_all_combinations
+from funcs.preprocessing import preprocessing_raw
 
 class home:
     def __init__(self):
@@ -16,7 +17,7 @@ class home:
         col1, col2 = st.columns(2)
         raw_data_file = col1.file_uploader("Upload Raw Data")
 
-        if raw_data_file is not None:
+        if (raw_data_file is not None) and ("raw_data" not in st.session_state):
             st.session_state.raw_data  = load_data_raw(raw_data_file)
 
         if "raw_data" in st.session_state:
@@ -54,7 +55,8 @@ class home:
 @st.cache
 def load_data_raw(file):
     df = pd.read_csv(file, encoding='utf-8')
-    return df 
+    df = preprocessing_raw(df)
+    return df
 
 @st.cache
 def load_data_syn(file):
