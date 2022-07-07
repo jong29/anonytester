@@ -15,38 +15,57 @@ class home:
             """
         )
         col1, col2 = st.columns(2)
-        raw_data_file = col1.file_uploader("Upload Raw Data")
 
+        #raw data uploader
+        raw_data_file = col1.file_uploader("Upload Raw Data")
         if (raw_data_file is not None) and ("raw_data" not in st.session_state):
             st.session_state.raw_file_name = str(raw_data_file.name)
             st.session_state.raw_data  = load_data_raw(raw_data_file)
 
         if "raw_data" in st.session_state:
-            st.session_state.drop_raw = col1.multiselect(
+            if "drop_raw_disp" not in st.session_state:
+                st.session_state.drop_raw_disp = list()
+            form_selec_raw = col1.form("drop select raw", clear_on_submit = True)
+            add_drop_raw = form_selec_raw.multiselect(
                 "제거할 속성을 선택해주세요",
-                list(st.session_state.raw_data.columns))
-            st.session_state.raw_data = st.session_state.raw_data.drop(st.session_state.drop_raw,axis=1)
+                st.session_state.raw_data.columns)
+            submitted_raw = form_selec_raw.form_submit_button("Submit")
+            if submitted_raw:
+                drop_raw = add_drop_raw
+                st.session_state.drop_raw_disp += add_drop_raw
+                st.session_state.raw_data = st.session_state.raw_data.drop(drop_raw,axis=1)
     
             with col1.expander("입력 데이터 확인"):
                     st.markdown(f"### {st.session_state.raw_file_name}")
-                    st.write(st.session_state.drop_raw)
+                    st.write(f"제거된 속성: {to_str(st.session_state.drop_raw_disp)}")
                     st.caption(f"레코드 수: {str(len(st.session_state.raw_data))}\
                         \n속성 수: {str(len(st.session_state.raw_data.columns))}\
                         \n속성 조합 수 {str(len(get_all_combinations(st.session_state.raw_data, None))-1)}")
                     st.dataframe(st.session_state.raw_data[:1000])
 
 
+        #synthetic data uploader
         syn_data_file = col2.file_uploader("Upload Synthetic Data")
-        if syn_data_file is not None:
+        if (syn_data_file is not None) and ("syn_data" not in st.session_state):
+            st.session_state.syn_file_name = str(syn_data_file.name)
             st.session_state.syn_data  = load_data_syn(syn_data_file)
-        
+
         if "syn_data" in st.session_state:
-            st.session_state.drop_syn = col2.multiselect(
+            if "drop_syn_disp" not in st.session_state:
+                st.session_state.drop_syn_disp = list()
+            form_selec_syn = col2.form("drop select syn", clear_on_submit = True)
+            add_drop_syn = form_selec_syn.multiselect(
                 "제거할 속성을 선택해주세요",
-                list(st.session_state.syn_data.columns))
-            st.session_state.syn_data = st.session_state.syn_data.drop(st.session_state.drop_syn,axis=1)
+                st.session_state.syn_data.columns)
+            submitted_syn = form_selec_syn.form_submit_button("Submit")
+            if submitted_syn:
+                drop_syn = add_drop_syn
+                st.session_state.drop_syn_disp += add_drop_syn
+                st.session_state.syn_data = st.session_state.syn_data.drop(drop_syn,axis=1)
+    
             with col2.expander("입력 데이터 확인"):
-                    st.write(st.session_state.drop_syn)
+                    st.markdown(f"### {st.session_state.syn_file_name}")
+                    st.write(f"제거된 속성: {to_str(st.session_state.drop_syn_disp)}")
                     st.caption(f"레코드 수: {str(len(st.session_state.syn_data))}\
                         \n속성 수: {str(len(st.session_state.syn_data.columns))}\
                         \n속성 조합 수 {str(len(get_all_combinations(st.session_state.syn_data, None))-1)}")
@@ -64,3 +83,6 @@ def load_data_raw(file):
 def load_data_syn(file):
     df = pd.read_csv(file, encoding='utf-8')
     return df 
+
+def to_str(drop_list):
+    return ", ".join(drop_list)
