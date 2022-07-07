@@ -1,6 +1,7 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 from classes.raw_data import raw_data
+from classes.syn_data_risk import syn_data_risk
 from classes.home import home
 
 class SideBar:
@@ -16,9 +17,9 @@ class SideBar:
         if selected == "Raw Data":
             raw_data()
         if selected == "Synthetic Data Risk":
-            st.title(f"you selected {selected}")
+            syn_data_risk()
         if selected == "Synthetic Data Usefulness": 
-            st.title(f"you selected {selected}")   
+            st.title(f"you selected {selected}")
 
         with st.sidebar:
             st.sidebar.title("About")

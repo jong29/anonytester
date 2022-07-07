@@ -18,20 +18,19 @@ def preprocessing_raw(raw_data):
     return raw_data
 
 #====================================고수준 전처리=============================
-def preprocessing_high(data_path, drop_cols):
-    high_data = pd.read_csv(data_path)
-    high_data = high_data.drop(drop_cols,axis=1)
+def preprocessing_high(high_data):
+    # high_data = pd.read_csv(data_path)
+    # high_data = high_data.drop(drop_cols,axis=1)
     high_data = remove_unneccessary_columns(high_data)
-
     high_data = high_data.set_index('abst_row_num__')
     high_data.columns = high_data.columns.str.lower()
     return high_data
 
 
 #====================================저수준 전처리=============================
-def preprocessing_low(data_path, drop_cols):
-    low_data = pd.read_csv(data_path)
-    low_data = low_data.drop(drop_cols,axis=1)
+def preprocessing_low(low_data):
+    # low_data = pd.read_csv(data_path)
+    # low_data = low_data.drop(drop_cols,axis=1)
     low_data = remove_unneccessary_columns(low_data)
     low_data = preprocess_lowlevel_df(low_data)
     low_data = low_data.set_index('abst_row_num__')

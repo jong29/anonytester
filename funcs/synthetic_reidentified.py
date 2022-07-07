@@ -2,7 +2,7 @@ import pandas as pd
 import itertools
 import numpy as np
 from tqdm import tqdm
-import risk
+import funcs.risk as risk
 
 def is_unique(data):
     dropped_cols = []

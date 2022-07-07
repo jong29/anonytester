@@ -1,5 +1,4 @@
 #modules
-from tracemalloc import start
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -113,4 +112,4 @@ class raw_data:
                             )
                         st.session_state.raw_reid_done = True
         except AttributeError:
-            st.markdown("###missing raw data")
+            st.markdown("### missing raw data")
