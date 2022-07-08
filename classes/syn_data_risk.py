@@ -99,11 +99,12 @@ class syn_data_risk:
                     if start_button or st.session_state.syn_reid_done:
                         reidentified_res = st.container()
                         begin = time.time()
-                        syn_reidentified = syn_reidentified_datas(st.session_state.syn_data, K=-1,start_dim=values[0],end_dim=values[1])
+                        syn_reidentified = syn_reidentified_datas(st.session_state.raw_data, st.session_state.syn_data, K=-1,start_dim=values[0],end_dim=values[1])
                         reidentified_res.write(f"소요시간: {(time.time()-begin):.2f}초")
                         reidentified_res.write(syn_reidentified[:1000])
                         reid_rate = len(syn_reidentified)/len(st.session_state.syn_data)
                         reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
+                        reidentified_res.subheader(f"재식별된 레코드 수: {len(syn_reidentified)}")
                         reidentified_res.download_button(
                                 label="재식별된 데이터 csv로 저장",
                                 data = convert_df2csv(syn_reidentified),

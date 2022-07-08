@@ -104,6 +104,7 @@ class raw_data:
                         reidentified_res.write(raw_reidentified[:1000])
                         reid_rate = len(raw_reidentified)/len(st.session_state.raw_data)
                         reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
+                        reidentified_res.subheader(f"재식별된 레코드 수: {len(raw_reidentified)}")
                         reidentified_res.download_button(
                                 label="재식별된 데이터 csv로 저장",
                                 data = convert_df2csv(raw_reidentified),

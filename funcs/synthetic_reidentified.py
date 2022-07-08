@@ -2,7 +2,9 @@ import pandas as pd
 import itertools
 import numpy as np
 from tqdm import tqdm
+from stqdm import stqdm
 import funcs.risk as risk
+import streamlit as st
 
 def is_unique(data):
     dropped_cols = []
@@ -30,6 +32,7 @@ def get_all_combinations(data, Priority, start_dim=1,end_dim=-1):
         all_combinations += combinations_list
     return list(all_combinations)
 
+@st.cache(suppress_st_warning=True, show_spinner=False)
 def syn_reidentified_datas(raw_data, syn_data, K=-1, start_dim=1, end_dim=-1):
     single_attr, one_attr, record, table = risk.compute_risk(syn_data.copy())
     Priority = list(one_attr.index)
@@ -44,7 +47,8 @@ def syn_reidentified_datas(raw_data, syn_data, K=-1, start_dim=1, end_dim=-1):
     combs = get_all_combinations(raw_data, Priority, start_dim, end_dim)
     print("총: " + str(len(combs)) + " 개의 속성 조합을 검사합니다")
     
-    loop = tqdm(list(combs), total=len(combs), leave=True)
+    # loop = tqdm(list(combs), total=len(combs), leave=True)
+    loop = stqdm(list(combs))
 
     temp_uniques=pd.DataFrame()
     syn_reident=pd.DataFrame()
@@ -59,6 +63,6 @@ def syn_reidentified_datas(raw_data, syn_data, K=-1, start_dim=1, end_dim=-1):
                 syn_reident = syn_reident.drop_duplicates(subset="abst_row_num__",keep="first")
                 if(len(syn_reident) >= K):
                     break
-    # syn_reident = syn_reident.sort_values('abst_row_num__')
+    syn_reident = syn_reident.sort_values('abst_row_num__')
     return syn_reident
 
