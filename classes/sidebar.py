@@ -3,13 +3,14 @@ from streamlit_option_menu import option_menu
 from classes.raw_data import raw_data
 from classes.syn_data_risk import syn_data_risk
 from classes.home import home
+from classes.comb_reid import comb_reid
 
 class SideBar:
     def __init__(self):
         with st.sidebar:
             selected = option_menu(
                     menu_title = "Navigation",
-                    options=["Home", "Raw Data", "Synthetic Data Risk", "Synthetic Data Usefulness"],
+                    options=["Home", "Raw Data", "Synthetic Data Risk", "Synthetic Data Usefulness", "Combine Re-Id"],
                     orientation="vertical"
                 )
         if selected == "Home":
@@ -20,6 +21,8 @@ class SideBar:
             syn_data_risk()
         if selected == "Synthetic Data Usefulness": 
             st.title(f"you selected {selected}")
+        if selected == 'Combine Re-Id':
+            comb_reid()
 
         with st.sidebar:
             st.sidebar.title("About")
