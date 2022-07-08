@@ -89,17 +89,18 @@ class syn_data_risk:
 
                 st.subheader("재현데이터 재식별도")
                 with st.expander("재식별도 계산"):
-                    start_cont = st.container()
-                    col1, col2, col3 = start_cont.columns([1, 4, 1])
-                    start_button = col1.button("재식별도 계산 시작")
-                    values = col2.slider('재식별도 계산 Dimension을 선택하세요',
-                                        1, len(st.session_state.syn_data.columns),(1, len(st.session_state.syn_data.columns)))
+                    start_cont = st.form("reid_calc")
+                    col0, col1, col2, col3, col4 = start_cont.columns([0.3, 5, 1, 20, 1])
+                    dims = col3.slider('재식별도 계산 Dimension을 선택',
+                                        1, len(st.session_state.raw_data.columns),(1, len(st.session_state.raw_data.columns)))
+                    record_num = col1.number_input("재식별 확인 레코드 수", min_value=-1, step=1, help="-1을 입력하시면 전체를 확인합니다.")
                     if "syn_reid_done" not in st.session_state:
                         st.session_state.syn_reid_done = False
+                    start_button = col1.form_submit_button("재식별도 계산 시작")
                     if start_button or st.session_state.syn_reid_done:
                         reidentified_res = st.container()
                         begin = time.time()
-                        syn_reidentified = syn_reidentified_datas(st.session_state.raw_data, st.session_state.syn_data, K=-1,start_dim=values[0],end_dim=values[1])
+                        syn_reidentified = syn_reidentified_datas(st.session_state.raw_data, st.session_state.syn_data, K=record_num,start_dim=dims[0],end_dim=dims[1])
                         reidentified_res.write(f"소요시간: {(time.time()-begin):.2f}초")
                         reidentified_res.write(syn_reidentified[:1000])
                         reid_rate = len(syn_reidentified)/len(st.session_state.syn_data)
