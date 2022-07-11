@@ -64,11 +64,10 @@ start_dim:  속성 조합 시작 dimension (get_all_combinations 함수에 설�
 end_dim:    속성 조합 끝 dimension   (get_all_combinations 함수에 설명 있음)
 """
 @st.cache(suppress_st_warning=True, show_spinner=False)
-def raw_reidentified_datas(raw_data, one_attr, K=-1, start_dim=1, end_dim=-1):
+def raw_reidentified_datas(raw_data, K=-1, start_dim=1, end_dim=-1):
     #=============원본 재식별 위험도=============
-    # single_attr, one_attr, record, table = risk.compute_risk(raw_data.copy())
+    single_attr, one_attr, record, table = risk.compute_risk(raw_data.copy())
     Priority = list(one_attr.index)
-    st.write(Priority)
 
     #=============원본 재식별도=============
     #K가 -1이면 전부 검사 (데이터 길이만큼)
@@ -79,7 +78,7 @@ def raw_reidentified_datas(raw_data, one_attr, K=-1, start_dim=1, end_dim=-1):
     data,dropped_cols  = is_unique(raw_data)
     print("모두 같은 값을 가져 drop된 속성: ", dropped_cols)
     #속성 조합 반환
-    data =  data.reindex(columns = Priority)
+    # data =  data.reindex(columns = Priority)
     combs = get_all_combinations(data, start_dim, end_dim)
 
     reidentified_evidence = pd.DataFrame()
