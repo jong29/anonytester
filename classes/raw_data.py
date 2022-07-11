@@ -99,6 +99,7 @@ class raw_data:
                     start_button = col1.form_submit_button("재식별도 계산 시작")
                     if start_button or st.session_state.raw_reid_done:
                         reidentified_res = st.container()
+                        reidentified_res.write(f"총 {st.session_state.raw_comb_num}개의 속성 조합을 검사합니다.")
                         begin = time.time()
                         raw_reidentified = raw_reidentified_datas(st.session_state.raw_data, K=record_num,start_dim=dims[0],end_dim=dims[1])
                         reidentified_res.write(f"소요시간: {(time.time()-begin):.2f}초")

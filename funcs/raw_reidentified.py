@@ -79,8 +79,6 @@ def raw_reidentified_datas(raw_data, K=-1, start_dim=1, end_dim=-1):
     print("모두 같은 값을 가져 drop된 속성: ", dropped_cols)
     #속성 조합 반환
     combs = get_all_combinations(data, Priority, start_dim, end_dim)
-    temp_comb = st.container()
-    temp_comb.write("총: " + str(len(combs)) + " 개의 속성 조합을 검사합니다")
 
     reidentified_evidence = pd.DataFrame()
     # loop = tqdm(list(combs), total=len(combs), leave=True)
@@ -94,5 +92,4 @@ def raw_reidentified_datas(raw_data, K=-1, start_dim=1, end_dim=-1):
         if(len(reidentified_evidence) >= K):
             break
     reidentified_evidence = reidentified_evidence.sort_values("abst_row_num__").reset_index(drop=True)
-    del temp_comb
     return reidentified_evidence

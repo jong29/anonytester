@@ -34,16 +34,15 @@ class home:
                 drop_raw = add_drop_raw
                 st.session_state.drop_raw_disp += add_drop_raw
                 st.session_state.raw_data = st.session_state.raw_data.drop(drop_raw,axis=1)
-            st.write(submitted_raw)
     
             with col1.expander("입력 데이터 확인"):
-                    st.markdown(f"### {st.session_state.raw_file_name}")
-                    st.write(f"제거된 속성: {to_str(st.session_state.drop_raw_disp)}")
-                    st.caption(f"레코드 수: {str(len(st.session_state.raw_data))}\
-                        \n속성 수: {str(len(st.session_state.raw_data.columns))}\
-                        \n속성 조합 수 {str(len(get_all_combinations(st.session_state.raw_data, None))-1)}")
-                    st.dataframe(st.session_state.raw_data[:1000])
-
+                st.session_state.raw_comb_num = len(get_all_combinations(st.session_state.raw_data, None))
+                st.markdown(f"### {st.session_state.raw_file_name}")
+                st.write(f"제거된 속성: {st.session_state.drop_raw_disp}")
+                st.caption(f"레코드 수: {len(st.session_state.raw_data)}\
+                    \n속성 수: {len(st.session_state.raw_data.columns)}\
+                    \n속성 조합 수 {st.session_state.raw_comb_num}")
+                st.dataframe(st.session_state.raw_data[:1000])
 
         #synthetic data uploader
         syn_data_file = col2.file_uploader("Upload Synthetic Data")
@@ -75,12 +74,13 @@ class home:
                 st.session_state.syn_data = st.session_state.syn_data.drop(drop_syn,axis=1)
     
             with col2.expander("입력 데이터 확인"):
-                    st.markdown(f"### {st.session_state.syn_file_name}")
-                    st.write(f"제거된 속성: {to_str(st.session_state.drop_syn_disp)}")
-                    st.caption(f"레코드 수: {str(len(st.session_state.syn_data))}\
-                        \n속성 수: {str(len(st.session_state.syn_data.columns))}\
-                        \n속성 조합 수 {str(len(get_all_combinations(st.session_state.syn_data, None))-1)}")
-                    st.dataframe(st.session_state.syn_data[:1000])
+                st.session_state.syn_comb_num = len(get_all_combinations(st.session_state.syn_data, None))
+                st.markdown(f"### {st.session_state.syn_file_name}")
+                st.write(f"제거된 속성: {st.session_state.drop_syn_disp}")
+                st.caption(f"레코드 수: {len(st.session_state.syn_data)}\
+                    \n속성 수: {len(st.session_state.syn_data.columns)}\
+                    \n속성 조합 수 {st.session_state.syn_comb_num}")
+                st.dataframe(st.session_state.syn_data[:1000])
 
 
 #cache functions
