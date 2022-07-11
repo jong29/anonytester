@@ -33,9 +33,9 @@ def get_all_combinations(data, start_dim=1,end_dim=-1):
     return list(all_combinations)
 
 @st.cache(suppress_st_warning=True, show_spinner=False)
-def syn_reidentified_datas(raw_data, syn_data, K=-1, start_dim=1, end_dim=-1):
-    single_attr, one_attr, record, table = risk.compute_risk(syn_data.copy())
-    Priority = list(one_attr.index)
+def syn_reidentified_datas(raw_data, syn_data, syn_one_attr, K=-1, start_dim=1, end_dim=-1):
+    # single_attr, one_attr, record, table = risk.compute_risk(syn_data.copy())
+    Priority = list(syn_one_attr.index)
 
     if(K==-1):
         K=len(syn_data)
@@ -45,7 +45,7 @@ def syn_reidentified_datas(raw_data, syn_data, K=-1, start_dim=1, end_dim=-1):
     print("모두 같은 값을 가져 drop된 속성: ", raw_dropped_cols)
 
     raw_data =  raw_data.reindex(columns = Priority)
-    combs = get_all_combinations(raw_data, Priority, start_dim, end_dim)
+    combs = get_all_combinations(raw_data, start_dim, end_dim)
     print("총: " + str(len(combs)) + " 개의 속성 조합을 검사합니다")
     
     # loop = tqdm(list(combs), total=len(combs), leave=True)
