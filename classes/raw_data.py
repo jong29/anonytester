@@ -6,7 +6,7 @@ from io import BytesIO
 import time
 
 #functions
-from funcs.risk import compute_risk
+from funcs.risk_raw import compute_risk
 from funcs.utility import convert_df2csv
 from funcs.raw_reidentified import raw_reidentified_datas
 

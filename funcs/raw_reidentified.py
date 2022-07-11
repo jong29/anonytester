@@ -2,7 +2,7 @@ import pandas as pd
 import itertools
 import numpy as np
 from tqdm import tqdm
-import funcs.risk as risk
+import funcs.risk_raw as risk
 import streamlit as st
 from stqdm import stqdm
 
@@ -64,9 +64,9 @@ start_dim:  속성 조합 시작 dimension (get_all_combinations 함수에 설�
 end_dim:    속성 조합 끝 dimension   (get_all_combinations 함수에 설명 있음)
 """
 @st.cache(suppress_st_warning=True, show_spinner=False)
-def raw_reidentified_datas(raw_data, K=-1, start_dim=1, end_dim=-1):
+def raw_reidentified_datas(raw_data, one_attr, K=-1, start_dim=1, end_dim=-1):
     #=============원본 재식별 위험도=============
-    single_attr, one_attr, record, table = risk.compute_risk(raw_data.copy())
+    # single_attr, one_attr, record, table = risk.compute_risk(raw_data.copy())
     Priority = list(one_attr.index)
 
     #=============원본 재식별도=============

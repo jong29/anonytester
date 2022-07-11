@@ -6,7 +6,7 @@ from io import BytesIO
 import time
 
 #functions
-from funcs.risk import compute_risk
+from funcs.risk_syn import compute_risk
 from funcs.utility import convert_df2csv
 from funcs.synthetic_reidentified import syn_reidentified_datas
 
