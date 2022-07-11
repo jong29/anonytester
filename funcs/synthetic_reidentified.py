@@ -20,7 +20,7 @@ def find_unique_data(data, comb):
     unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
     return unique
 
-def get_all_combinations(data, Priority, start_dim=1,end_dim=-1):
+def get_all_combinations(data, start_dim=1,end_dim=-1):
     all_combinations = list()
     if(start_dim == -1):
         start_dim = len(data.columns)
@@ -44,6 +44,7 @@ def syn_reidentified_datas(raw_data, syn_data, K=-1, start_dim=1, end_dim=-1):
     syn_data = syn_data.drop(raw_dropped_cols, axis=1)
     print("모두 같은 값을 가져 drop된 속성: ", raw_dropped_cols)
 
+    raw_data =  raw_data.reindex(columns = Priority)
     combs = get_all_combinations(raw_data, Priority, start_dim, end_dim)
     print("총: " + str(len(combs)) + " 개의 속성 조합을 검사합니다")
     
