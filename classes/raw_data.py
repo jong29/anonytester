@@ -20,7 +20,6 @@ class raw_data:
                 if("raw_single_attr" not in st.session_state):
                     st.session_state.raw_single_attr, st.session_state.raw_one_attr, st.session_state.raw_record, st.session_state.raw_table \
                             = compute_risk(st.session_state.raw_data.copy())
-
                 with st.expander("테이블 재식별 위험도"):
                     #속성 값 재식별 위험도
                     st.download_button(
@@ -102,7 +101,7 @@ class raw_data:
                         reidentified_res = st.container()
                         reidentified_res.write(f"총 {st.session_state.raw_comb_num}개의 속성 조합을 검사합니다.")
                         begin = time.time()
-                        raw_reidentified = raw_reidentified_datas(st.session_state.raw_data, K=record_num,start_dim=dims[0],end_dim=dims[1])
+                        raw_reidentified = raw_reidentified_datas(st.session_state.raw_data, st.session_state.raw_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
                         reidentified_res.write(f"소요시간: {(time.time()-begin):.2f}초")
                         reidentified_res.write(raw_reidentified[:1000])
                         reid_rate = len(raw_reidentified)/len(st.session_state.raw_data)
