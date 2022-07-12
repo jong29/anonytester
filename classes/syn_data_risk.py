@@ -12,7 +12,7 @@ from funcs.synthetic_reidentified import syn_reidentified_datas
 
 class syn_data_risk:
     def __init__(self):
-        st.markdown("# Synthetic Data Analysis")
+        st.markdown("# 재현데이터 분석")
         try:
             if st.session_state.syn_data is not None:
                 st.subheader("재현데이터 재식별 위험도")
@@ -41,7 +41,9 @@ class syn_data_risk:
                                 fmt='_r', ecolor='tab:orange', lw=3, capsize=3)
                     buf = BytesIO()
                     fig.savefig(buf, format="png")
-                    col2.image(buf)
+                    show_table_risk = st.checkbox("그래프 보기", key="syn_table_graph")
+                    if show_table_risk:
+                        col2.image(buf)
                     
 
                 with st.expander("레코드 재식별 위험도"):
@@ -74,7 +76,9 @@ class syn_data_risk:
                                 fmt='_r', ecolor='tab:orange', lw=3, capsize=3)
                     buf = BytesIO()
                     fig.savefig(buf, format="png")
-                    st.image(buf)
+                    show_attr_risk = st.checkbox("그래프 보기", key="syn_attr_graph")
+                    if show_attr_risk:
+                        st.image(buf)
                     
 
                 with st.expander('속성 값 재식별 위험도'):
@@ -102,7 +106,6 @@ class syn_data_risk:
                         begin = time.time()
                         syn_reidentified = syn_reidentified_datas(st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
                         reidentified_res.write(f"소요시간: {(time.time()-begin):.2f}초")
-                        reidentified_res.write(syn_reidentified[:1000])
                         reid_rate = len(syn_reidentified)/len(st.session_state.syn_data)
                         reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
                         reidentified_res.subheader(f"재식별된 레코드 수: {len(syn_reidentified)}")
@@ -112,6 +115,7 @@ class syn_data_risk:
                                 file_name='재식별된 데이터.csv',
                                 mime='text/csv',
                             )
+                        reidentified_res.write(syn_reidentified[:1000])
                         st.session_state.syn_reid_done = True
         except AttributeError:
             st.markdown("### Upload Synthetic Data for Anlysis!")

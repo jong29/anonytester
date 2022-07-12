@@ -41,8 +41,9 @@ class raw_data:
                                 fmt='_r', ecolor='tab:orange', lw=3, capsize=3)
                     buf = BytesIO()
                     fig.savefig(buf, format="png")
-                    col2.image(buf)
-                    
+                    show_table_risk = st.checkbox("그래프 보기", key="raw_table_graph")
+                    if show_table_risk:
+                        col2.image(buf)
 
                 with st.expander("레코드 재식별 위험도"):
                     st.download_button(
@@ -74,7 +75,9 @@ class raw_data:
                                 fmt='_r', ecolor='tab:orange', lw=3, capsize=3)
                     buf = BytesIO()
                     fig.savefig(buf, format="png")
-                    st.image(buf)
+                    show_attr_risk = st.checkbox("그래프 보기", key="raw_attr_graph")
+                    if show_attr_risk:
+                        st.image(buf)
                     
 
                 with st.expander('속성 값 재식별 위험도'):
@@ -103,7 +106,6 @@ class raw_data:
                         begin = time.time()
                         raw_reidentified = raw_reidentified_datas(st.session_state.raw_data, st.session_state.raw_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
                         reidentified_res.write(f"소요시간: {(time.time()-begin):.2f}초")
-                        reidentified_res.write(raw_reidentified[:1000])
                         reid_rate = len(raw_reidentified)/len(st.session_state.raw_data)
                         reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
                         reidentified_res.subheader(f"재식별된 레코드 수: {len(raw_reidentified)}")
@@ -113,6 +115,7 @@ class raw_data:
                                 file_name='재식별된 데이터.csv',
                                 mime='text/csv',
                             )
+                        reidentified_res.write(raw_reidentified[:1000])
                         st.session_state.raw_reid_done = True
         except AttributeError:
             st.markdown("### missing raw data")
