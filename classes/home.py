@@ -1,4 +1,5 @@
 #modules
+from multiprocessing.sharedctypes import Value
 import streamlit as st
 import pandas as pd
 
@@ -17,10 +18,14 @@ class home:
         col1, col2 = st.columns(2)
 
         #raw data uploader
-        raw_data_file = col1.file_uploader("Upload Raw Data")
+        raw_data_file = col1.file_uploader("원본데이터 업로드")
+        
         if (raw_data_file is not None) and ("raw_data" not in st.session_state):
             st.session_state.raw_file_name = str(raw_data_file.name)
-            st.session_state.raw_data  = load_data_raw(raw_data_file)
+            try:
+                st.session_state.raw_data  = load_data_raw(raw_data_file)
+            except ValueError as er:
+                st.error(f"ValueError {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n원본데이터인지 확인해주세요.")
 
         if "raw_data" in st.session_state:
             if "drop_raw_disp" not in st.session_state:
@@ -45,7 +50,8 @@ class home:
                 st.dataframe(st.session_state.raw_data[:1000])
 
         #synthetic data uploader
-        syn_data_file = col2.file_uploader("Upload Synthetic Data")
+        syn_data_file = col2.file_uploader("재현데이터 업로드")
+
         if (syn_data_file is not None) and ("syn_data" not in st.session_state):
             lev_select = col2.form("syn_lev")
             st.session_state.syn_data_lev = lev_select.radio("재현데이터 수준선택", ("고수준", "저수준"), horizontal=True)
@@ -53,12 +59,14 @@ class home:
 
             if lev_selected:
                 st.session_state.syn_file_name = str(syn_data_file.name)
-                if st.session_state.syn_data_lev == "고수준":
-                    st.session_state.syn_data  = load_data_syn_high(syn_data_file)
-                elif st.session_state.syn_data_lev == "저수준":
-                    with st.spinner("저수준 재현데이터 전처리중..."):
-                        st.session_state.syn_data  = load_data_syn_low(syn_data_file)
-                    
+                try:
+                    if st.session_state.syn_data_lev == "고수준":
+                        st.session_state.syn_data  = load_data_syn_high(syn_data_file)
+                    elif st.session_state.syn_data_lev == "저수준":
+                        with st.spinner("저수준 재현데이터 전처리중..."):
+                            st.session_state.syn_data  = load_data_syn_low(syn_data_file)
+                except KeyError as er:
+                    st.error(f"KeyError: {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n재현데이터인지 확인해주세요.")
 
         if "syn_data" in st.session_state:
             if "drop_syn_disp" not in st.session_state:

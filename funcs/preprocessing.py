@@ -22,10 +22,19 @@ def preprocessing_high(high_data):
     # high_data = pd.read_csv(data_path)
     # high_data = high_data.drop(drop_cols,axis=1)
     high_data = remove_unneccessary_columns(high_data)
+    ##### 고수준 json 처리
+    high_data = preprocess_highlevel_df(high_data)
+    #######
     high_data = high_data.set_index('abst_row_num__')
     high_data.columns = high_data.columns.str.lower()
     return high_data
 
+def preprocess_highlevel_df(syn_data):
+    syn_cols = list(syn_data.columns)
+    preprocessed_syn_data=pd.DataFrame()
+    for c in syn_cols:
+        preprocessed_syn_data[c] = syn_data[c].apply(preprocess_json)
+    return preprocessed_syn_data
 
 #====================================저수준 전처리=============================
 def preprocessing_low(low_data):
