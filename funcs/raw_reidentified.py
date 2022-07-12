@@ -92,5 +92,6 @@ def raw_reidentified_datas(raw_data, one_attr, K=-1, start_dim=1, end_dim=-1):
             reidentified_evidence = reidentified_evidence.drop_duplicates(subset ="abst_row_num__",keep="first")
         if(len(reidentified_evidence) >= K):
             break
-    reidentified_evidence = reidentified_evidence.sort_values("abst_row_num__").reset_index(drop=True)
+    if not reidentified_evidence.empty:
+        reidentified_evidence = reidentified_evidence.sort_values("abst_row_num__").reset_index(drop=True)
     return reidentified_evidence

@@ -1,4 +1,5 @@
 import pandas as pd
+import streamlit as st
 
 #특성 유사도
 def numeric_similarity(vec ,max_val ,min_val):
@@ -75,6 +76,7 @@ def table_similarity(record_similarity_df):
                                     columns = ['mean', 'std', 'max', 'min']) 
     return table_similarity_df
 
+@st.cache
 def similarity(raw_data, syn_data):
     val_similarity_df = val_simiarlity(raw_data,syn_data)
     attr_similarity_df = attr_simiarlity(val_similarity_df)

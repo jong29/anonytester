@@ -9,15 +9,19 @@ from funcs.preprocessing import preprocessing_low, preprocessing_high, preproces
 
 class home:
     def __init__(self):
-        st.write("# Welcome to Anonymity Tester!")
+        st.write("# 재현데이터 평가도구 ANONY TESTER")
         st.markdown(
             """
             Anony Tester는 재현데이터의 안정성 및 유용성 지표를 평가합니다.
-            """
+            <br>
+            <br>
+            """,
+            unsafe_allow_html=True
         )
         col1, col2 = st.columns(2)
 
         #raw data uploader
+        col1.markdown("### 원본데이터")
         raw_data_file = col1.file_uploader("원본데이터 업로드")
         
         if (raw_data_file is not None) and ("raw_data" not in st.session_state):
@@ -34,7 +38,7 @@ class home:
             add_drop_raw = form_selec_raw.multiselect(
                 "제거할 속성을 선택해주세요",
                 st.session_state.raw_data.columns)
-            submitted_raw = form_selec_raw.form_submit_button("Submit")
+            submitted_raw = form_selec_raw.form_submit_button("선택 완료")
             if submitted_raw:
                 drop_raw = add_drop_raw
                 st.session_state.drop_raw_disp += add_drop_raw
@@ -50,12 +54,13 @@ class home:
                 st.dataframe(st.session_state.raw_data[:1000])
 
         #synthetic data uploader
+        col2.markdown("### 재현데이터")
         syn_data_file = col2.file_uploader("재현데이터 업로드")
 
         if (syn_data_file is not None) and ("syn_data" not in st.session_state):
             lev_select = col2.form("syn_lev")
             st.session_state.syn_data_lev = lev_select.radio("재현데이터 수준선택", ("고수준", "저수준"), horizontal=True)
-            lev_selected = lev_select.form_submit_button("선택 완료")
+            lev_selected = lev_select.form_submit_button("다음")
 
             if lev_selected:
                 st.session_state.syn_file_name = str(syn_data_file.name)
@@ -75,7 +80,7 @@ class home:
             add_drop_syn = form_selec_syn.multiselect(
                 "제거할 속성을 선택해주세요",
                 st.session_state.syn_data.columns)
-            submitted_syn = form_selec_syn.form_submit_button("Submit")
+            submitted_syn = form_selec_syn.form_submit_button("선택 완료")
             if submitted_syn:
                 drop_syn = add_drop_syn
                 st.session_state.drop_syn_disp += add_drop_syn

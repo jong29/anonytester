@@ -64,7 +64,7 @@ def syn_reidentified_datas(raw_data, syn_data, syn_one_attr, K=-1, start_dim=1, 
                 syn_reident = syn_reident.drop_duplicates(subset="abst_row_num__",keep="first")
                 if(len(syn_reident) >= K):
                     break
-    if not syn_reident.empty():
-        syn_reident = syn_reident.sort_values('abst_row_num__')
+    if not syn_reident.empty:
+        syn_reident = syn_reident.sort_values('abst_row_num__').reset_index(drop=True)
     return syn_reident
 

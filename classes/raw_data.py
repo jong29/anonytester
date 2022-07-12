@@ -13,7 +13,7 @@ from funcs.raw_reidentified import raw_reidentified_datas
 
 class raw_data:
     def __init__(self):
-        st.markdown("# Raw Data Analysis")
+        st.markdown("# 원본 데이터 분석")
         try:
             if "raw_data" in st.session_state:
                 st.subheader("원본데이터 재식별 위험도")

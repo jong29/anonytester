@@ -4,24 +4,25 @@ from classes.raw_data import raw_data
 from classes.syn_data_risk import syn_data_risk
 from classes.home import home
 from classes.comb_reid import comb_reid
+from classes.syn_use import syn_use
 
 class SideBar:
     def __init__(self):
         with st.sidebar:
             selected = option_menu(
-                    menu_title = "Navigation",
-                    options=["Home", "Raw Data", "Synthetic Data Risk", "Synthetic Data Usefulness", "Combine Re-Id"],
+                    menu_title = "페이지 설정",
+                    options=["Home", "원본데이터", "재현데이터 안정성", "재현데이터 유용성", "재현데이터 결합"],
                     orientation="vertical"
                 )
         if selected == "Home":
             home()
-        if selected == "Raw Data":
+        if selected == "원본데이터":
             raw_data()
-        if selected == "Synthetic Data Risk":
+        if selected == "재현데이터 안정성":
             syn_data_risk()
-        if selected == "Synthetic Data Usefulness": 
-            st.title(f"you selected {selected}")
-        if selected == 'Combine Re-Id':
+        if selected == "재현데이터 유용성": 
+            syn_use()
+        if selected == '재현데이터 결합':
             comb_reid()
 
         with st.sidebar:

@@ -1,10 +1,4 @@
-import re
 import pandas as pd
-from pandas import DataFrame
-import numpy as np
-import itertools
-from tqdm import tqdm
-
 import streamlit as st
 
 #속성값 재식별 위험도
@@ -48,18 +42,19 @@ def record_risk(risk_data):
     for attr in raw_data_cols:
         temp_dict = transform_to_risk(risk_data, attr)
         risk_data[attr] = risk_data[attr].map(temp_dict)
-    record_risk['레코드 평균 위험도'] = risk_data.mean(axis=1)
-    record_risk['레코드 위험도 표준 편차'] = risk_data.std(axis=1)
-    record_risk['레코드 최대 위험도'] = risk_data.max(axis=1)
-    record_risk['레코드 최소 위험도'] = risk_data.min(axis=1)
-    record_risk = record_risk.sort_values('레코드 평균 위험도',ascending=False).reset_index().rename(columns={'index':'기존 레코드 행 번호'})
+    record_risk['mean'] = risk_data.mean(axis=1)
+    record_risk['std'] = risk_data.std(axis=1)
+    record_risk['max'] = risk_data.max(axis=1)
+    record_risk['min'] = risk_data.min(axis=1)
+    record_risk = record_risk.sort_values('mean',ascending=False).reset_index().rename(columns={"abst_row_num__":"기존 행"})
     return record_risk
 
 @st.cache(show_spinner=False,suppress_st_warning=True)
 def table_risk(record_risk):
-    table_risk = pd.DataFrame(record_risk['레코드 평균 위험도'].describe()).T
+    table_risk = pd.DataFrame(record_risk['mean'].describe()).T
+    table_risk = table_risk.rename(index={"mean":"평균"})
     table_risk = table_risk[['mean','std','max','min']]
-    table_risk = table_risk.rename(index={"레코드 평균 위험도":"테이블 재식별 위험도"})
+    table_risk = table_risk.rename(index={"평균":"테이블 재식별 위험도"})
     return table_risk 
 
 @st.cache(show_spinner=False,suppress_st_warning=True)
