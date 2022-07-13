@@ -11,27 +11,27 @@ class SideBar:
         with st.sidebar:
             selected = option_menu(
                     menu_title = "페이지 설정",
-                    options=["Home", "원본데이터", "재현데이터 안정성", "재현데이터 유용성", "재현데이터 결합"],
+                    options=["Home", "원본데이터", "재현데이터", "유사도", "재식별도 결합"],
                     orientation="vertical"
                 )
         if selected == "Home":
             home()
         if selected == "원본데이터":
             raw_data()
-        if selected == "재현데이터 안정성":
+        if selected == "재현데이터":
             syn_risk()
-        if selected == "재현데이터 유용성": 
+        if selected == "유사도": 
             syn_use()
-        if selected == '재현데이터 결합':
+        if selected == '재식별도 결합':
             comb_reid()
 
         with st.sidebar:
             st.sidebar.title("About")
             st.sidebar.info(
                 '''
-                연세대학교 데이터베이스 연구실
-                연락처: 010-1234-5678\n
-                이메일: gmail.com\n
+                연세대 데이터베이스 연구실\n
+                연락처: 02-2123-7823\n
+                이메일: @yonsei.ac.kr\n
                 홈페이지: <http://database.yonsei.ac.kr/>
                 '''
             )

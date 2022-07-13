@@ -28,7 +28,6 @@ class raw_data:
                     st.session_state.raw_single_attr, st.session_state.raw_one_attr, st.session_state.raw_record, st.session_state.raw_table \
                         = compute_risk(st.session_state.raw_data.copy())
 
-            #원본 재식별도 페이지
             if raw_selected == "원본 재식별도":
                 self.raw_reid()
             if raw_selected == "테이블 재식별 위험도":
@@ -38,7 +37,9 @@ class raw_data:
             if raw_selected == "속성값 재식별 위험도":
                 self.raw_attr_val()
             if raw_selected == "레코드 재식별 위험도":
-                self.raw_record()                
+                self.raw_record()
+        else:
+            st.markdown("##  \n##  \n## 업로드된 원본데이터가 없습니다")
 
     def raw_reid(self):
         st.subheader("원본데이터 재식별도")
@@ -70,6 +71,7 @@ class raw_data:
 
     def raw_table(self):
         #테이블 재식별 위험도
+        st.subheader('테이블 재식별 위험도')
         col1, col2 = st.columns(2)
         col1.dataframe(st.session_state.raw_table.round(decimals = 4))
         fig, ax = plt.subplots(figsize=(4,4))
@@ -118,6 +120,7 @@ class raw_data:
         )
 
     def raw_attr_val(self):
+        st.subheader('속성값 재식별 위험도')
         st.session_state.raw_single_attr = st.session_state.raw_single_attr.round(4).head(200)
         st.dataframe(st.session_state.raw_single_attr.astype(str))
         st.download_button(
@@ -129,6 +132,7 @@ class raw_data:
         
 
     def raw_record(self):
+        st.subheader('레코드 재식별 위험도')
         st.dataframe(st.session_state.raw_record.round(decimals = 4).head(200))
         st.download_button(
             label="레코드 재식별 위험도 csv로 저장",
