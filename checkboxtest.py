@@ -1,9 +1,19 @@
 from tabnanny import check
 import streamlit as st
 
-cols = ['i', 'am', 'not', 'afraid']
-checkboxes = list()
+attrs = ['i', 'am', 'not', 'afraid', 'to', 'take', 'a', 'step']
+drop_dict = dict()
+drop_cols = list()
 
-check1 = st.checkbox(cols[0])
+with st.form('myform'):
+    for col in attrs:
+        drop_dict[col] = st.checkbox(col, key = col + '_raw')
+    
+    submitted = st.form_submit_button("submit cols")
 
-st.write(check1)
+if submitted:
+    for col in attrs:
+        if drop_dict[col]:
+            drop_cols.append(col)
+
+st.write(drop_cols)
