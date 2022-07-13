@@ -23,7 +23,7 @@ class home:
 
         #raw data uploader
         col1.markdown("### 원본데이터")
-        raw_data_file = col1.file_uploader("원본데이터 업로드")
+        raw_data_file = col1.file_uploader("원본데이터 업로드", type="csv")
         
         if (raw_data_file is not None) and ("raw_data" not in st.session_state):
             st.session_state.raw_file_name = str(raw_data_file.name)
@@ -60,7 +60,7 @@ class home:
 
         #synthetic data uploader
         col2.markdown("### 재현데이터")
-        syn_data_file = col2.file_uploader("재현데이터 업로드")
+        syn_data_file = col2.file_uploader("재현데이터 업로드", type="csv")
 
         if (syn_data_file is not None) and ("syn_data" not in st.session_state):
             lev_select = col2.form("syn_lev")

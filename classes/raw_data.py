@@ -52,7 +52,7 @@ class raw_data:
                         file_name='레코드 재식별 위험도.csv',
                         mime='text/csv',
                     )
-                    st.dataframe(st.session_state.raw_record.round(decimals = 4))
+                    st.dataframe(st.session_state.raw_record.round(decimals = 4).head(200))
                     
 
                 with st.expander('속성 재식별 위험도'):
@@ -87,7 +87,7 @@ class raw_data:
                         file_name='속성 값 재식별 위험도.csv',
                         mime='text/csv',
                     )
-                    st.session_state.raw_single_attr = st.session_state.raw_single_attr.round(4)
+                    st.session_state.raw_single_attr = st.session_state.raw_single_attr.round(4).head(200)
                     st.dataframe(st.session_state.raw_single_attr.astype(str))
 
                 st.subheader("원본데이터 재식별도")

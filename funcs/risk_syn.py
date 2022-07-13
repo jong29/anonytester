@@ -15,7 +15,7 @@ def single_attr_value_risk(dataframe):
         
     one_attr_value_risk_table['속성 값 재식별 위험도'] =(1- (one_attr_value_risk_table['counts']-1)/(len(dataframe)-1)).astype("float")
     one_attr_value_risk_table = one_attr_value_risk_table.drop('counts',axis=1)
-    one_attr_value_risk_table = one_attr_value_risk_table.sort_values(['속성','속성 값 재식별 위험도'],ascending=False).reset_index(drop=True)
+    one_attr_value_risk_table = one_attr_value_risk_table.sort_values(['속성 값 재식별 위험도','속성'],ascending=False).reset_index(drop=True)
     return one_attr_value_risk_table
 
 @st.cache(show_spinner=False,suppress_st_warning=True)
