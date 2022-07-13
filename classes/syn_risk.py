@@ -10,7 +10,7 @@ from funcs.risk_syn import compute_risk
 from funcs.utility import convert_df2csv
 from funcs.synthetic_reidentified import syn_reidentified_datas
 
-class syn_data_risk:
+class syn_risk:
     def __init__(self):
         st.markdown("# 재현데이터 분석")
         try:
@@ -25,7 +25,7 @@ class syn_data_risk:
                     st.download_button(
                         label="테이블 재식별 위험도 csv로 저장",
                         data = convert_df2csv(st.session_state.syn_table),
-                        file_name='테이블 재식별 위험도.csv',
+                        file_name=st.session_state.syn_file_name[:-4] + '_테이블 재식별 위험도.csv',
                         mime='text/csv',
                     )
                     col1, col2 = st.columns(2)
@@ -50,7 +50,7 @@ class syn_data_risk:
                     st.download_button(
                         label="레코드 재식별 위험도 csv로 저장",
                         data = convert_df2csv(st.session_state.syn_record),
-                        file_name='레코드 재식별 위험도.csv',
+                        file_name=st.session_state.syn_file_name[:-4] + '_레코드 재식별 위험도.csv',
                         mime='text/csv',
                     )
                     st.dataframe(st.session_state.syn_record.round(decimals = 4)).head(200)
@@ -60,7 +60,7 @@ class syn_data_risk:
                     st.download_button(
                         label="속성 재식별 위험도 csv로 저장",
                         data = convert_df2csv(st.session_state.syn_one_attr),
-                        file_name='속성 재식별 위험도.csv',
+                        file_name=st.session_state.raw_file_name[:-4] + '_속성 재식별 위험도.csv',
                         mime='text/csv',
                     )
                     st.subheader('속성 재식별 위험도')
@@ -85,7 +85,7 @@ class syn_data_risk:
                     st.download_button(
                         label="속성 값 재식별 위험도 csv로 저장",
                         data = convert_df2csv(st.session_state.syn_single_attr),
-                        file_name='속성 값 재식별 위험도.csv',
+                        file_name=st.session_state.raw_file_name[:-4] + '_속성 값 재식별 위험도.csv',
                         mime='text/csv',
                     )
                     st.session_state.syn_single_attr = st.session_state.syn_single_attr.round(4).head(200)
@@ -112,7 +112,7 @@ class syn_data_risk:
                         reidentified_res.download_button(
                                 label="재식별된 데이터 csv로 저장",
                                 data = convert_df2csv(syn_reidentified),
-                                file_name='재식별된 데이터.csv',
+                                file_name=st.session_state.raw_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv',
                                 mime='text/csv',
                             )
                         reidentified_res.write(syn_reidentified[:1000])

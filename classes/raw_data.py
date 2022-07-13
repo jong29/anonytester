@@ -25,7 +25,7 @@ class raw_data:
                     st.download_button(
                         label="테이블 재식별 위험도 csv로 저장",
                         data = convert_df2csv(st.session_state.raw_table),
-                        file_name='테이블 재식별 위험도.csv',
+                        file_name=st.session_state.raw_file_name[:-4] + '_테이블 재식별 위험도.csv',
                         mime='text/csv',
                     )
                     col1, col2 = st.columns(2)
@@ -49,7 +49,7 @@ class raw_data:
                     st.download_button(
                         label="레코드 재식별 위험도 csv로 저장",
                         data = convert_df2csv(st.session_state.raw_record),
-                        file_name='레코드 재식별 위험도.csv',
+                        file_name=st.session_state.raw_file_name[:-4] + '_레코드 재식별 위험도.csv',
                         mime='text/csv',
                     )
                     st.dataframe(st.session_state.raw_record.round(decimals = 4).head(200))
@@ -59,7 +59,7 @@ class raw_data:
                     st.download_button(
                         label="속성 재식별 위험도 csv로 저장",
                         data = convert_df2csv(st.session_state.raw_one_attr),
-                        file_name='속성 재식별 위험도.csv',
+                        file_name=st.session_state.raw_file_name[:-4] + '_속성 재식별 위험도.csv',
                         mime='text/csv',
                     )
                     st.subheader('속성 재식별 위험도')
@@ -84,7 +84,7 @@ class raw_data:
                     st.download_button(
                         label="속성 값 재식별 위험도 csv로 저장",
                         data = convert_df2csv(st.session_state.raw_single_attr),
-                        file_name='속성 값 재식별 위험도.csv',
+                        file_name=st.session_state.raw_file_name[:-4] + '_속성 값 재식별 위험도.csv',
                         mime='text/csv',
                     )
                     st.session_state.raw_single_attr = st.session_state.raw_single_attr.round(4).head(200)
@@ -112,7 +112,7 @@ class raw_data:
                         reidentified_res.download_button(
                                 label="재식별된 데이터 csv로 저장",
                                 data = convert_df2csv(raw_reidentified),
-                                file_name='재식별된 데이터.csv',
+                                file_name=st.session_state.raw_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv',
                                 mime='text/csv',
                             )
                         reidentified_res.write(raw_reidentified[:1000])

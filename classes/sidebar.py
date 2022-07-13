@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 from classes.raw_data import raw_data
-from classes.syn_data_risk import syn_data_risk
+from classes.syn_risk import syn_risk
 from classes.home import home
 from classes.comb_reid import comb_reid
 from classes.syn_use import syn_use
@@ -19,7 +19,7 @@ class SideBar:
         if selected == "원본데이터":
             raw_data()
         if selected == "재현데이터 안정성":
-            syn_data_risk()
+            syn_risk()
         if selected == "재현데이터 유용성": 
             syn_use()
         if selected == '재현데이터 결합':
