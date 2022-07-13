@@ -76,7 +76,7 @@ def table_similarity(record_similarity_df):
                                     columns = ['mean', 'std', 'max', 'min']) 
     return table_similarity_df
 
-@st.cache
+@st.cache(suppress_st_warning=True)
 def similarity(raw_data, syn_data):
     val_similarity_df = val_simiarlity(raw_data,syn_data)
     attr_similarity_df = attr_simiarlity(val_similarity_df)
