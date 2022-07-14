@@ -17,6 +17,7 @@ ex) get_all_combinations(data=raw_data, 1,3)
 
 return: 속성 조합의 list
 """
+@st.cache(suppress_st_warning=True, show_spinner=False)
 def get_all_combinations(data, start_dim=1,end_dim=-1):
     all_combinations = list()
     if(start_dim == -1):

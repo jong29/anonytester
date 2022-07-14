@@ -14,18 +14,6 @@ class SideBar:
                     options=["Home", "원본데이터", "재현데이터", "유사도", "재식별도 결합"],
                     orientation="vertical"
                 )
-        if selected == "Home":
-            home()
-        if selected == "원본데이터":
-            raw_data()
-        if selected == "재현데이터":
-            syn_risk()
-        if selected == "유사도": 
-            syn_use()
-        if selected == '재식별도 결합':
-            comb_reid()
-
-        with st.sidebar:
             st.sidebar.title("About")
             st.sidebar.info(
                 '''
@@ -35,5 +23,16 @@ class SideBar:
                 홈페이지: <http://database.yonsei.ac.kr/>
                 '''
             )
+
+        if selected == "Home":
+            home()
+        if selected == "원본데이터":
+            raw_data()
+        if selected == "재현데이터":
+            syn_risk()
+        if selected == "유사도": 
+            syn_use()
+        if selected == '재식별도 결합':
+            comb_reid()            
 
     

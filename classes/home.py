@@ -108,19 +108,16 @@ class home:
 
 
 #cache functions
-@st.cache(show_spinner=False)
 def load_data_raw(file):
     df = pd.read_csv(file, encoding='utf-8')
     df = preprocessing_raw(df)
     return df
 
-@st.cache(show_spinner=False)
 def load_data_syn_high(file):
     df = pd.read_csv(file, encoding='utf-8')
     df = preprocessing_high(df)
     return df 
 
-@st.cache(show_spinner = False)
 def load_data_syn_low(file):
     df = pd.read_csv(file, encoding='utf-8')
     df = preprocessing_low(df)

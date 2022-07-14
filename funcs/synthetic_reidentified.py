@@ -20,6 +20,7 @@ def find_unique_data(data, comb):
     unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
     return unique
 
+@st.cache(suppress_st_warning=True, show_spinner=False)
 def get_all_combinations(data, start_dim=1,end_dim=-1):
     all_combinations = list()
     if(start_dim == -1):

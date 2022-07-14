@@ -14,7 +14,7 @@ class syn_use:
         )
 
         if ("syn_data" in st.session_state) and ("raw_data" in st.session_state):
-            if "syn_single_attr" not in st.session_state:
+            if "val_similarity" not in st.session_state:
                 with st.spinner("유사도 계산중..."):
                     st.session_state.val_similarity, st.session_state.attr_similarity, st.session_state.record_similarity, st.session_state.table_similarity\
                         = similarity(st.session_state.raw_data, st.session_state.syn_data)
@@ -35,7 +35,7 @@ class syn_use:
         st.dataframe(st.session_state.val_similarity.round(decimals = 3).head(200))
         st.download_button(
             label="특성 유사도 csv로 저장",
-            data = convert_df2csv(st.session_state.syn_table),
+            data = convert_df2csv(st.session_state.val_similarity),
             file_name=st.session_state.syn_file_name[:-4] + '_특성유사도.csv',
             mime='text/csv',
         )
@@ -45,7 +45,7 @@ class syn_use:
         st.dataframe(st.session_state.attr_similarity)
         st.download_button(
             label="속성 유사도 csv로 저장",
-            data = convert_df2csv(st.session_state.syn_table),
+            data = convert_df2csv(st.session_state.attr_similarity),
             file_name=st.session_state.syn_file_name[:-4] + '_속성유사도.csv',
             mime='text/csv',
         )
@@ -55,7 +55,7 @@ class syn_use:
         st.dataframe(st.session_state.record_similarity.round(decimals = 3).head(200))
         st.download_button(
             label="레코드 유사도 csv로 저장",
-            data = convert_df2csv(st.session_state.syn_table),
+            data = convert_df2csv(st.session_state.record_similarity),
             file_name=st.session_state.syn_file_name[:-4] + '_레코드유사도.csv',
             mime='text/csv',
         )
@@ -65,7 +65,7 @@ class syn_use:
         st.dataframe(st.session_state.table_similarity)
         st.download_button(
             label="테이블 유사도 csv로 저장",
-            data = convert_df2csv(st.session_state.syn_table),
+            data = convert_df2csv(st.session_state.table_similarity),
             file_name=st.session_state.syn_file_name[:-4] + '_테이블유사도.csv',
             mime='text/csv',
         )

@@ -64,7 +64,7 @@ class syn_risk:
             reidentified_res.download_button(
                     label="재식별된 데이터 csv로 저장",
                     data = convert_df2csv(syn_reidentified),
-                    file_name=st.session_state.raw_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv',
+                    file_name=st.session_state.syn_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv',
                     mime='text/csv',
                 )
             reidentified_res.write(syn_reidentified[:1000])
@@ -114,7 +114,7 @@ class syn_risk:
         st.download_button(
             label="속성 재식별 위험도 csv로 저장",
             data = convert_df2csv(st.session_state.syn_one_attr),
-            file_name=st.session_state.raw_file_name[:-4] + '_속성 재식별 위험도.csv',
+            file_name=st.session_state.syn_file_name[:-4] + '_속성 재식별 위험도.csv',
             mime='text/csv',
         )
 
@@ -124,7 +124,7 @@ class syn_risk:
         st.download_button(
             label="속성 값 재식별 위험도 csv로 저장",
             data = convert_df2csv(st.session_state.syn_single_attr),
-            file_name=st.session_state.raw_file_name[:-4] + '_속성 값 재식별 위험도.csv',
+            file_name=st.session_state.syn_file_name[:-4] + '_속성 값 재식별 위험도.csv',
             mime='text/csv',
         )
         

@@ -58,6 +58,8 @@ def attr_simiarlity(similarity_df):
                                    similarity_df.min(),\
                                    similarity_df.std()],axis=1)
     attr_simiarlity_df.columns = ['mean','max','min','std']
+    attr_simiarlity_df.reset_index(inplace=True)
+    attr_simiarlity_df.rename(columns={'index':'속성'}, inplace=True)
     return attr_simiarlity_df
 
 def record_similarity(similarity_df):
@@ -76,7 +78,7 @@ def table_similarity(record_similarity_df):
                                     columns = ['mean', 'std', 'max', 'min']) 
     return table_similarity_df
 
-@st.cache(suppress_st_warning=True)
+@st.cache(show_spinner=False)
 def similarity(raw_data, syn_data):
     val_similarity_df = val_simiarlity(raw_data,syn_data)
     attr_similarity_df = attr_simiarlity(val_similarity_df)
