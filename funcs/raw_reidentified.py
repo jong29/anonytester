@@ -77,7 +77,7 @@ def raw_reidentified_datas(raw_data, one_attr, K=-1, start_dim=1, end_dim=-1):
     
     #모두 같은 값을 가지는 속성 제거
     data,dropped_cols  = is_unique(raw_data)
-    print("모두 같은 값을 가져 drop된 속성: ", dropped_cols)
+    ("모두 같은 값을 가져 drop된 속성: ", dropped_cols)
     #속성 조합 반환
     # data =  data.reindex(columns = Priority)
     combs = get_all_combinations(data, start_dim, end_dim)
