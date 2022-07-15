@@ -45,7 +45,7 @@ def syn_reidentified_datas(raw_data, syn_data, syn_one_attr, K=-1, start_dim=1, 
     syn_data = syn_data.drop(raw_dropped_cols, axis=1)
     # print("모두 같은 값을 가져 drop된 속성: ", raw_dropped_cols)
 
-    raw_data =  raw_data.reindex(columns = Priority)
+    # raw_data =  raw_data.reindex(columns = Priority)
     combs = get_all_combinations(raw_data, start_dim, end_dim)
     # print("총: " + str(len(combs)) + " 개의 속성 조합을 검사합니다")
     

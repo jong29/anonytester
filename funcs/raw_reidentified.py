@@ -33,7 +33,7 @@ def get_all_combinations(data, start_dim=1,end_dim=-1):
 """
 모두 같은 값을 가지는 속성(컬럼)들을 순회하면서 drop
 
-return: 드랍된 후의 데이터 프레임 & 어떤 컬림이 드랍됐는지
+return: 드랍된 후의 데이터 프레임 & 어떤 컬림이 드랍됐는지 리턴
 """
 def is_unique(data):
     dropped_cols = []
@@ -77,7 +77,7 @@ def raw_reidentified_datas(raw_data, one_attr, K=-1, start_dim=1, end_dim=-1):
     
     #모두 같은 값을 가지는 속성 제거
     data,dropped_cols  = is_unique(raw_data)
-    ("모두 같은 값을 가져 drop된 속성: ", dropped_cols)
+
     #속성 조합 반환
     # data =  data.reindex(columns = Priority)
     combs = get_all_combinations(data, start_dim, end_dim)
@@ -95,4 +95,4 @@ def raw_reidentified_datas(raw_data, one_attr, K=-1, start_dim=1, end_dim=-1):
             break
     if not reidentified_evidence.empty:
         reidentified_evidence = reidentified_evidence.sort_values("abst_row_num__").reset_index(drop=True)
-    return reidentified_evidence
+    return reidentified_evidence, dropped_cols

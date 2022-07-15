@@ -55,7 +55,7 @@ class raw_data:
             reidentified_res = st.container()
             reidentified_res.write(f"총 {st.session_state.raw_comb_num}개의 속성 조합을 검사합니다.")
             begin = time.time()
-            raw_reidentified = raw_reidentified_datas(st.session_state.raw_data, st.session_state.raw_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
+            raw_reidentified, dropped_cols = raw_reidentified_datas(st.session_state.raw_data, st.session_state.raw_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
             reidentified_res.write(f"소요시간: {(time.time()-begin):.2f}초")
             reid_rate = len(raw_reidentified)/len(st.session_state.raw_data)
             reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
@@ -67,6 +67,14 @@ class raw_data:
                     mime='text/csv',
                 )
             reidentified_res.write(raw_reidentified[:1000])
+            if dropped_cols is not None:
+                drop_str = "모두 같은 값을 가져 drop된 속성: "
+                for i in range(len(dropped_cols)):
+                    if i != 0:
+                        drop_str += ", "
+                    drop_str += str(dropped_cols[i])
+                st.markdown("##### " + drop_str)
+
             st.session_state.raw_reid_done = True
 
     def raw_table(self):

@@ -30,7 +30,7 @@ def val_simiarlity(raw_data, syn_data):
             similarity_df[col+"_y"] = similarity_df[col+"_y"].astype("float")    
         except:
             similarity_df[col+"_x"] = similarity_df[col+"_x"].astype("str")
-            similarity_df[col+"_y"] = similarity_df[col+"_y"].astype("str")    
+            similarity_df[col+"_y"] = similarity_df[col+"_y"].astype("str")
 
     numeric_cols = list(similarity_df.select_dtypes(include=["int","float"]).columns)
     category_cols = list(similarity_df.select_dtypes(include=["object"]).columns)
