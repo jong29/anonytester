@@ -56,7 +56,7 @@ class syn_risk:
         if start_button or st.session_state.syn_reid_done:
             reidentified_res = st.container()
             begin = time.time()
-            syn_reidentified = syn_reidentified_datas(st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
+            syn_reidentified, dropped_cols = syn_reidentified_datas(st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
             reidentified_res.write(f"소요시간: {(time.time()-begin):.2f}초")
             reid_rate = len(syn_reidentified)/len(st.session_state.syn_data)
             reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
@@ -68,6 +68,13 @@ class syn_risk:
                     mime='text/csv',
                 )
             reidentified_res.write(syn_reidentified[:1000])
+            if dropped_cols is not None:
+                drop_str = "모두 같은 값을 가져 drop된 속성: "
+                for i in range(len(dropped_cols)):
+                    if i != 0:
+                        drop_str += ", "
+                    drop_str += str(dropped_cols[i])
+                st.markdown("##### " + drop_str)
             st.session_state.syn_reid_done = True
 
     def syn_table(self):

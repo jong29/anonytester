@@ -67,5 +67,5 @@ def syn_reidentified_datas(raw_data, syn_data, syn_one_attr, K=-1, start_dim=1, 
                     break
     if not syn_reident.empty:
         syn_reident = syn_reident.sort_values('abst_row_num__').reset_index(drop=True)
-    return syn_reident
+    return syn_reident, raw_dropped_cols
 
