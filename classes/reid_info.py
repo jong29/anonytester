@@ -17,3 +17,6 @@ class reid_info:
                     st.markdown(f"### 검사 완료한 디멘션:  \n{data['dimensions'][0]}에서 {data['dimensions'][1]}")
                     
                     f.close()
+
+def update_json():
+    pass
