@@ -56,17 +56,25 @@ class syn_risk:
         if start_button or st.session_state.syn_reid_done:
             reidentified_res = st.container()
             begin = time.time()
-            syn_reidentified, dropped_cols = syn_reidentified_datas(st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
+            syn_reidentified, dropped_cols = syn_reidentified_datas(st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr,\
+                                            K=record_num,start_dim=dims[0],end_dim=dims[1])
             reidentified_res.write(f"소요시간: {(time.time()-begin):.2f}초")
             reid_rate = len(syn_reidentified)/len(st.session_state.syn_data)
             reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
             reidentified_res.subheader(f"재식별된 레코드 수: {len(syn_reidentified)}")
-            reidentified_res.download_button(
-                    label="재식별된 데이터 csv로 저장",
-                    data = convert_df2csv(syn_reidentified),
-                    file_name=st.session_state.syn_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv',
-                    mime='text/csv',
-                )
+            syn_reid_dir = st.text_input("재식별도 파일 다운로드할 경로를 입력해주세요")
+            if syn_reid_dir != "":
+                file_name=st.session_state.syn_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv'
+                f=open(syn_reid_dir + '/' + file_name, 'w', encoding='utf-8')
+                f.write(str(convert_df2csv(syn_reidentified)))
+                st.success("재식별도 파일 다운로드 완료")
+                f.close()
+            # reidentified_res.download_button(
+            #         label="재식별된 데이터 csv로 저장",
+            #         data = convert_df2csv(syn_reidentified),
+            #         file_name=st.session_state.syn_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv',
+            #         mime='text/csv',
+            #     )
             reidentified_res.write(syn_reidentified[:1000])
             if dropped_cols is not None:
                 drop_str = "모두 같은 값을 가져 drop된 속성: "
