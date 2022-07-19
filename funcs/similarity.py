@@ -18,6 +18,18 @@ def category_similarity(vec):
             return 0
     else:
         return round((1/(syn_connected+1)),2)
+
+def category_similarity_revised(vec, distinct):
+    raw_cate     = vec[0]
+    syn_cate     = vec[1]
+    syn_connected = syn_cate.count('/')
+    if(syn_connected == 0):
+        if(raw_cate == syn_cate):
+            return 1
+        else:
+            return 0
+    else:
+        return round(1-(syn_connected/distinct),3)
     
 def val_simiarlity(raw_data, syn_data):
     #========================특성 유사도========================
@@ -46,7 +58,7 @@ def val_simiarlity(raw_data, syn_data):
         similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(numeric_similarity, \
                                                                   args=(similarity_df[col+"_x"].max(),similarity_df[col+"_x"].min()), axis=1)
     for col in category_cols:
-        similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(category_similarity, axis=1)
+        similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(category_similarity_revised, args=[similarity_df[col+"_x"].nunique()], axis=1)
 
     similarity_df = similarity_df[raw_cols]
     return similarity_df
