@@ -47,14 +47,7 @@ class syn_risk:
         start_button = col1.form_submit_button("재식별도 계산 시작")
         if start_button or st.session_state.syn_reid_done:
             reidentified_res = st.container()
-<<<<<<< HEAD
-            begin = time.time()
-            syn_reidentified, dropped_cols = syn_reidentified_datas(st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr,\
-                                            K=record_num,start_dim=dims[0],end_dim=dims[1])
-            reidentified_res.write(f"소요시간: {(time.time()-begin):.2f}초")
-=======
             syn_reidentified, dropped_cols = syn_reidentified_datas(st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
->>>>>>> 86129c610d6e82f33ba186276668010763624e8f
             reid_rate = len(syn_reidentified)/len(st.session_state.syn_data)
             reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
             reidentified_res.subheader(f"재식별된 레코드 수: {len(syn_reidentified)}")
