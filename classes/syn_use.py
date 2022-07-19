@@ -1,31 +1,24 @@
 import streamlit as st
 from funcs.similarity import similarity
-from streamlit_option_menu import option_menu
 from funcs.utility import convert_df2csv
 
 class syn_use:
     def __init__(self):
-        sim_selected = option_menu(
-            menu_title = "데이터 유사도",
-            menu_icon = "clipboard-data",
-            options=["테이블 유사도", "특성 유사도", "속성 유사도", "레코드 유사도"],
-            icons=["caret-right-fill", "caret-right-fill", "caret-right-fill", "caret-right-fill"],
-            orientation="horizontal"
-        )
-
         if ("syn_data" in st.session_state) and ("raw_data" in st.session_state):
             if "val_similarity" not in st.session_state:
                 with st.spinner("유사도 계산중..."):
                     st.session_state.val_similarity, st.session_state.attr_similarity, st.session_state.record_similarity, st.session_state.table_similarity\
                         = similarity(st.session_state.raw_data, st.session_state.syn_data)
 
-            if sim_selected == "테이블 유사도":
+            tab1, tab2, tab3, tab4 = st.tabs(["테이블 유사도", "특성 유사도", "속성 유사도", "레코드 유사도"])
+
+            with tab1:
                 self.table_sim()
-            if sim_selected == "특성 유사도":
+            with tab2:
                 self.val_sim()
-            if sim_selected == "속성 유사도":
+            with tab3:
                 self.attr_sim()
-            if sim_selected == "레코드 유사도":
+            with tab4:
                 self.record_sim()
         else:
             st.markdown("##  \n##  \n## 원본데이터 또는 재현데이터가 업로드 되지 않았습니다")    
