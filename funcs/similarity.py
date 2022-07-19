@@ -1,6 +1,9 @@
 import pandas as pd
 import streamlit as st
 
+#전역변수 구분자
+delimiter = '/'
+
 #특성 유사도
 def numeric_similarity(vec ,max_val ,min_val):
     raw_val = vec[0]
@@ -10,7 +13,7 @@ def numeric_similarity(vec ,max_val ,min_val):
 def category_similarity(vec):
     raw_cate     = vec[0]
     syn_cate     = vec[1]
-    syn_connected = syn_cate.count('/')
+    syn_connected = syn_cate.count(delimiter)
     if(syn_connected == 0):
         if(raw_cate == syn_cate):
             return 1
@@ -22,7 +25,7 @@ def category_similarity(vec):
 def category_similarity_revised(vec, distinct):
     raw_cate     = vec[0]
     syn_cate     = vec[1]
-    syn_connected = syn_cate.count('/')
+    syn_connected = syn_cate.count(delimiter)
     if(syn_connected == 0):
         if(raw_cate == syn_cate):
             return 1

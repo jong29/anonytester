@@ -1,8 +1,10 @@
 #modules
+import os
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
+from pathlib import Path
 
 #functions
 from funcs.risk_syn import compute_risk
@@ -31,8 +33,6 @@ class syn_risk:
                 self.syn_record()
         else:
             st.markdown("##  \n##  \n## 원본데이터 또는 재현데이터가 업로드 되지 않았습니다")
-                
-
             
 
     def syn_reid(self):
@@ -47,10 +47,36 @@ class syn_risk:
         start_button = col1.form_submit_button("재식별도 계산 시작")
         if start_button or st.session_state.syn_reid_done:
             reidentified_res = st.container()
-            syn_reidentified, dropped_cols = syn_reidentified_datas(st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
+            syn_reidentified, dropped_cols = syn_reidentified_datas(\
+                st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr,\
+                K=record_num,start_dim=dims[0],end_dim=dims[1])
+            # ------- 재식별도 계산 완료 -------
+
+            # 재식별도 관련 정보 표시
             reid_rate = len(syn_reidentified)/len(st.session_state.syn_data)
             reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
             reidentified_res.subheader(f"재식별된 레코드 수: {len(syn_reidentified)}")
+
+            # anonytester 기본 디렉토리 생성
+            try:
+                os.mkdir(str(Path.home()) + "/Desktop/Anonytest")
+            except FileExistsError:
+                pass
+
+            # 해당 재현데이터 디렉토리 생성
+            try:
+                os.mkdir(str(Path.home()) + "/Desktop/Anonytest/" + st.session_state.syn_file_name[:-4])
+            except FileExistsError:
+                pass
+
+            # metadata 파일 생성
+            if os.path.exists(str(Path.home()) + "/Desktop/Anonytest/" + st.session_state.syn_file_name[:-4] + "/metadata.json"):
+                #TODO: implement updating json if exists
+                pass
+            else:
+                #TODO: implement creating json if not exist
+                pass
+            
             syn_reid_dir = st.text_input("재식별도 파일 다운로드할 경로를 입력해주세요")
             if syn_reid_dir != "":
                 file_name=st.session_state.syn_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv'
@@ -58,14 +84,9 @@ class syn_risk:
                 f.write(str(convert_df2csv(syn_reidentified)))
                 st.success("재식별도 파일 다운로드 완료")
                 f.close()
-            # reidentified_res.download_button(
-            #         label="재식별된 데이터 csv로 저장",
-            #         data = convert_df2csv(syn_reidentified),
-            #         file_name=st.session_state.syn_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv',
-            #         mime='text/csv',
-            #     )
+
             reidentified_res.write(syn_reidentified[:1000])
-            if dropped_cols is not None:
+            if dropped_cols:
                 drop_str = "모두 같은 값을 가져 drop된 속성: "
                 for i in range(len(dropped_cols)):
                     if i != 0:

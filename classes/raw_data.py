@@ -57,7 +57,8 @@ class raw_data:
                     mime='text/csv',
                 )
             reidentified_res.write(raw_reidentified[:1000])
-            if dropped_cols is not None:
+            
+            if dropped_cols: #empty list is false
                 drop_str = "모두 같은 값을 가져 drop된 속성: "
                 for i in range(len(dropped_cols)):
                     if i != 0:
