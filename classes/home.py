@@ -82,10 +82,11 @@ class home:
             if lev_selected:
                 try:
                     if st.session_state.syn_data_lev == "고수준":
-                        st.session_state.syn_data  = load_data_syn_high(syn_data_file)
+                        with st.spinner("고수준 재현데이터 전처리중..."):
+                            st.session_state.syn_data = load_data_syn_high(syn_data_file)
                     elif st.session_state.syn_data_lev == "저수준":
                         with st.spinner("저수준 재현데이터 전처리중..."):
-                            st.session_state.syn_data  = load_data_syn_low(syn_data_file)
+                            st.session_state.syn_data = load_data_syn_low(syn_data_file)
                     st.experimental_rerun()
                 except KeyError as er:
                     st.error(f"KeyError: {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n재현데이터인지 확인해주세요.")
@@ -101,7 +102,8 @@ class home:
                     st.session_state.syn_file_name = str(syn_data_file.name)
                     try:
                         if st.session_state.syn_data_lev == "고수준":
-                            st.session_state.syn_data  = load_data_syn_high(syn_data_file)
+                            with st.spinner("고수준 재현데이터 전처리중..."):
+                                st.session_state.syn_data  = load_data_syn_high(syn_data_file)
                         elif st.session_state.syn_data_lev == "저수준":
                             with st.spinner("저수준 재현데이터 전처리중..."):
                                 st.session_state.syn_data  = load_data_syn_low(syn_data_file)
@@ -146,12 +148,12 @@ def load_data_raw(file):
 def load_data_syn_high(file):
     df = pd.read_csv(file, encoding='utf-8')
     df = preprocessing_high(df)
-    return df 
+    return df
 
 def load_data_syn_low(file):
     df = pd.read_csv(file, encoding='utf-8')
     df = preprocessing_low(df)
-    return df 
+    return df
 
 def to_str(drop_list):
     return ", ".join(drop_list)
