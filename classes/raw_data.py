@@ -3,8 +3,6 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
-import time
-from streamlit_option_menu import option_menu
 
 #functions
 from funcs.risk_raw import compute_risk
@@ -14,29 +12,23 @@ from funcs.raw_reidentified import raw_reidentified_datas
 
 class raw_data:
     def __init__(self):
-        raw_selected = option_menu(
-            menu_title = "원본 데이터 분석",
-            menu_icon = "clipboard-data",
-            options=["원본 재식별도", "테이블 재식별 위험도", "속성 재식별 위험도", "속성값 재식별 위험도", "레코드 재식별 위험도"],
-            icons=["caret-right-fill", "caret-right-fill", "caret-right-fill", "caret-right-fill", "caret-right-fill"],
-            orientation="horizontal"
-        )
-
         if "raw_data" in st.session_state:
             if("raw_single_attr" not in st.session_state):
                 with st.spinner("데이터 로딩중..."):
                     st.session_state.raw_single_attr, st.session_state.raw_one_attr, st.session_state.raw_record, st.session_state.raw_table \
                         = compute_risk(st.session_state.raw_data.copy())
 
-            if raw_selected == "원본 재식별도":
+            tab1, tab2, tab3, tab4, tab5 = st.tabs(["원본 재식별도", "테이블 재식별 위험도", "속성 재식별 위험도", "속성값 재식별 위험도", "레코드 재식별 위험도"])
+
+            with tab1:
                 self.raw_reid()
-            if raw_selected == "테이블 재식별 위험도":
+            with tab2:
                 self.raw_table()
-            if raw_selected == "속성 재식별 위험도":
+            with tab3:
                 self.raw_attr()
-            if raw_selected == "속성값 재식별 위험도":
+            with tab4:
                 self.raw_attr_val()
-            if raw_selected == "레코드 재식별 위험도":
+            with tab5:
                 self.raw_record()
         else:
             st.markdown("##  \n##  \n## 업로드된 원본데이터가 없습니다")
@@ -54,9 +46,7 @@ class raw_data:
         if start_button or st.session_state.raw_reid_done:
             reidentified_res = st.container()
             reidentified_res.write(f"총 {st.session_state.raw_comb_num}개의 속성 조합을 검사합니다.")
-            begin = time.time()
             raw_reidentified, dropped_cols = raw_reidentified_datas(st.session_state.raw_data, st.session_state.raw_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
-            reidentified_res.write(f"소요시간: {(time.time()-begin):.2f}초")
             reid_rate = len(raw_reidentified)/len(st.session_state.raw_data)
             reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
             reidentified_res.subheader(f"재식별된 레코드 수: {len(raw_reidentified)}")
@@ -80,6 +70,12 @@ class raw_data:
     def raw_table(self):
         #테이블 재식별 위험도
         st.subheader('테이블 재식별 위험도')
+        st.download_button(
+            label="테이블 재식별 위험도 csv로 저장",
+            data = convert_df2csv(st.session_state.raw_table),
+            file_name=st.session_state.raw_file_name[:-4] + '_테이블 재식별 위험도.csv',
+            mime='text/csv',
+        )
         col1, col2 = st.columns(2)
         col1.dataframe(st.session_state.raw_table.round(decimals = 4))
         fig, ax = plt.subplots(figsize=(4,4))
@@ -96,15 +92,16 @@ class raw_data:
         show_table_risk = st.checkbox("그래프 보기", key="raw_table_graph")
         if show_table_risk:
             col2.image(buf)
-        st.download_button(
-            label="테이블 재식별 위험도 csv로 저장",
-            data = convert_df2csv(st.session_state.raw_table),
-            file_name=st.session_state.raw_file_name[:-4] + '_테이블 재식별 위험도.csv',
-            mime='text/csv',
-        )
+        
 
     def raw_attr(self):
         st.subheader('속성 재식별 위험도')
+        st.download_button(
+            label="속성 재식별 위험도 csv로 저장",
+            data = convert_df2csv(st.session_state.raw_one_attr),
+            file_name=st.session_state.raw_file_name[:-4] + '_속성 재식별 위험도.csv',
+            mime='text/csv',
+        )
         st.dataframe(st.session_state.raw_one_attr.round(decimals = 4))
         fig, ax = plt.subplots(figsize=(12,4))
         means = st.session_state.raw_one_attr['mean']
@@ -120,33 +117,30 @@ class raw_data:
         show_attr_risk = st.checkbox("그래프 보기", key="raw_attr_graph")
         if show_attr_risk:
             st.image(buf)
-        st.download_button(
-            label="속성 재식별 위험도 csv로 저장",
-            data = convert_df2csv(st.session_state.raw_one_attr),
-            file_name=st.session_state.raw_file_name[:-4] + '_속성 재식별 위험도.csv',
-            mime='text/csv',
-        )
+        
 
     def raw_attr_val(self):
         st.subheader('속성값 재식별 위험도')
-        st.session_state.raw_single_attr = st.session_state.raw_single_attr.round(4).head(200)
-        st.dataframe(st.session_state.raw_single_attr.astype(str))
         st.download_button(
             label="속성 값 재식별 위험도 csv로 저장",
             data = convert_df2csv(st.session_state.raw_single_attr),
             file_name=st.session_state.raw_file_name[:-4] + '_속성 값 재식별 위험도.csv',
             mime='text/csv',
         )
+        st.session_state.raw_single_attr = st.session_state.raw_single_attr.round(4).head(200)
+        st.dataframe(st.session_state.raw_single_attr.astype(str))
+        
         
 
     def raw_record(self):
         st.subheader('레코드 재식별 위험도')
-        st.dataframe(st.session_state.raw_record.round(decimals = 4).head(200))
         st.download_button(
             label="레코드 재식별 위험도 csv로 저장",
             data = convert_df2csv(st.session_state.raw_record),
             file_name=st.session_state.raw_file_name[:-4] + '_레코드 재식별 위험도.csv',
             mime='text/csv',
         )
+        st.dataframe(st.session_state.raw_record.round(decimals = 4).head(200))
+        
         
 

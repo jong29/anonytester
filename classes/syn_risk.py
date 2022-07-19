@@ -3,8 +3,6 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
-import time
-from streamlit_option_menu import option_menu
 
 #functions
 from funcs.risk_syn import compute_risk
@@ -13,29 +11,23 @@ from funcs.synthetic_reidentified import syn_reidentified_datas
 
 class syn_risk:
     def __init__(self):
-        syn_selected = option_menu(
-            menu_title = "재현 데이터 분석",
-            menu_icon = "clipboard-data",
-            options=["재현 재식별도", "테이블 재식별 위험도", "속성 재식별 위험도", "속성값 재식별 위험도", "레코드 재식별 위험도"],
-            icons=["caret-right-fill", "caret-right-fill", "caret-right-fill", "caret-right-fill", "caret-right-fill"],
-            orientation="horizontal"
-        )
-
         if ("syn_data" in st.session_state) and ("raw_data" in st.session_state):
             if "syn_single_attr" not in st.session_state:
                 with st.spinner("데이터 로딩중..."):
                     st.session_state.syn_single_attr, st.session_state.syn_one_attr, st.session_state.syn_record, st.session_state.syn_table \
                         = compute_risk(st.session_state.syn_data.copy())
 
-            if syn_selected == "재현 재식별도":
+            tab1, tab2, tab3, tab4, tab5 = st.tabs(["재현 재식별도", "테이블 재식별 위험도", "속성 재식별 위험도", "속성값 재식별 위험도", "레코드 재식별 위험도"])
+
+            with tab1:
                 self.syn_reid()
-            if syn_selected == "테이블 재식별 위험도":
+            with tab2:
                 self.syn_table()
-            if syn_selected == "속성 재식별 위험도":
+            with tab3:
                 self.syn_attr()
-            if syn_selected == "속성값 재식별 위험도":
+            with tab4:
                 self.syn_attr_val()
-            if syn_selected == "레코드 재식별 위험도":
+            with tab5:
                 self.syn_record()
         else:
             st.markdown("##  \n##  \n## 원본데이터 또는 재현데이터가 업로드 되지 않았습니다")
@@ -55,10 +47,14 @@ class syn_risk:
         start_button = col1.form_submit_button("재식별도 계산 시작")
         if start_button or st.session_state.syn_reid_done:
             reidentified_res = st.container()
+<<<<<<< HEAD
             begin = time.time()
             syn_reidentified, dropped_cols = syn_reidentified_datas(st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr,\
                                             K=record_num,start_dim=dims[0],end_dim=dims[1])
             reidentified_res.write(f"소요시간: {(time.time()-begin):.2f}초")
+=======
+            syn_reidentified, dropped_cols = syn_reidentified_datas(st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
+>>>>>>> 86129c610d6e82f33ba186276668010763624e8f
             reid_rate = len(syn_reidentified)/len(st.session_state.syn_data)
             reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
             reidentified_res.subheader(f"재식별된 레코드 수: {len(syn_reidentified)}")
@@ -86,6 +82,13 @@ class syn_risk:
             st.session_state.syn_reid_done = True
 
     def syn_table(self):
+        st.subheader('테이블 재식별 위험도')
+        st.download_button(
+            label="테이블 재식별 위험도 csv로 저장",
+            data = convert_df2csv(st.session_state.syn_table),
+            file_name=st.session_state.syn_file_name[:-4] + '_테이블 재식별 위험도.csv',
+            mime='text/csv',
+        )
         col1, col2 = st.columns(2)
         col1.dataframe(st.session_state.syn_table.round(decimals = 4))
         fig, ax = plt.subplots(figsize=(4,4))
@@ -102,15 +105,16 @@ class syn_risk:
         show_table_risk = st.checkbox("그래프 보기", key="syn_table_graph")
         if show_table_risk:
             col2.image(buf)
-        st.download_button(
-            label="테이블 재식별 위험도 csv로 저장",
-            data = convert_df2csv(st.session_state.syn_table),
-            file_name=st.session_state.syn_file_name[:-4] + '_테이블 재식별 위험도.csv',
-            mime='text/csv',
-        )
+        
 
     def syn_attr(self):
         st.subheader('속성 재식별 위험도')
+        st.download_button(
+            label="속성 재식별 위험도 csv로 저장",
+            data = convert_df2csv(st.session_state.syn_one_attr),
+            file_name=st.session_state.syn_file_name[:-4] + '_속성 재식별 위험도.csv',
+            mime='text/csv',
+        )
         st.dataframe(st.session_state.syn_one_attr.round(decimals = 4))
         fig, ax = plt.subplots(figsize=(12,4))
         means = st.session_state.syn_one_attr['mean']
@@ -126,28 +130,26 @@ class syn_risk:
         show_attr_risk = st.checkbox("그래프 보기", key="syn_attr_graph")
         if show_attr_risk:
             st.image(buf)
-        st.download_button(
-            label="속성 재식별 위험도 csv로 저장",
-            data = convert_df2csv(st.session_state.syn_one_attr),
-            file_name=st.session_state.syn_file_name[:-4] + '_속성 재식별 위험도.csv',
-            mime='text/csv',
-        )
+
 
     def syn_attr_val(self):
-        st.session_state.syn_single_attr = st.session_state.syn_single_attr.round(4).head(200)
-        st.dataframe(st.session_state.syn_single_attr.astype(str))
+        st.subheader('속성값 재식별 위험도')
         st.download_button(
             label="속성 값 재식별 위험도 csv로 저장",
             data = convert_df2csv(st.session_state.syn_single_attr),
             file_name=st.session_state.syn_file_name[:-4] + '_속성 값 재식별 위험도.csv',
             mime='text/csv',
         )
+        st.session_state.syn_single_attr = st.session_state.syn_single_attr.round(4).head(200)
+        st.dataframe(st.session_state.syn_single_attr.astype(str))
+
         
     def syn_record(self):
-        st.dataframe(st.session_state.syn_record.round(decimals = 4).head(200))
+        st.subheader('레코드 재식별 위험도')
         st.download_button(
             label="레코드 재식별 위험도 csv로 저장",
             data = convert_df2csv(st.session_state.syn_record),
             file_name=st.session_state.syn_file_name[:-4] + '_레코드 재식별 위험도.csv',
             mime='text/csv',
         )
+        st.dataframe(st.session_state.syn_record.round(decimals = 4).head(200))

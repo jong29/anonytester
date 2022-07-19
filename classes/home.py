@@ -71,7 +71,7 @@ class home:
         # synthetic data uploader
         col2.markdown("### 재현데이터")
         syn_data_file = col2.file_uploader("재현데이터 업로드", type="csv")
-
+ 
         # first synthetic data upload
         if (syn_data_file is not None) and ("syn_data" not in st.session_state):
             st.session_state.syn_file_name = str(syn_data_file.name)
