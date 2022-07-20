@@ -5,14 +5,13 @@ from classes.syn_risk import syn_risk
 from classes.home import home
 from classes.comb_reid import comb_reid
 from classes.syn_use import syn_use
-from classes.reid_info import reid_info
 
 class SideBar:
     def __init__(self):
         with st.sidebar:
             selected = option_menu(
                     menu_title = "페이지 설정",
-                    options=["Home", "원본데이터", "재현데이터", "유사도", "재식별도 결합", "재식별 정보"],
+                    options=["Home", "원본데이터", "재현데이터", "유사도", "재식별도 결합"],
                     orientation="vertical"
                 )
             st.sidebar.title("About")
@@ -35,7 +34,4 @@ class SideBar:
             syn_use()
         if selected == '재식별도 결합':
             comb_reid()
-        if selected == "재식별 정보":
-            reid_info()
-
     

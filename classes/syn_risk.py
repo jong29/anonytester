@@ -16,12 +16,15 @@ class syn_risk:
     def __init__(self):
         if ("syn_data" in st.session_state) and ("raw_data" in st.session_state):
             if "syn_single_attr" not in st.session_state:
+                # 재현데이터 위험도 계산
                 with st.spinner("데이터 로딩중..."):
                     st.session_state.syn_single_attr, st.session_state.syn_one_attr, st.session_state.syn_record, st.session_state.syn_table \
                         = compute_risk(st.session_state.syn_data.copy())
 
-            tab1, tab2, tab3, tab4, tab5 = st.tabs(["재현 재식별도", "테이블 재식별 위험도", "속성 재식별 위험도", "속성값 재식별 위험도", "레코드 재식별 위험도"])
+            tab0, tab1, tab2, tab3, tab4, tab5 = st.tabs(["재현데이터 계산 정보" ,"재현 재식별도", "테이블 재식별 위험도", "속성 재식별 위험도", "속성값 재식별 위험도", "레코드 재식별 위험도"])
 
+            with tab0:
+                self.reid_info()
             with tab1:
                 self.syn_reid()
             with tab2:
@@ -58,31 +61,33 @@ class syn_risk:
             reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
             reidentified_res.subheader(f"재식별된 레코드 수: {len(syn_reidentified)}")
 
-            # anonytester 기본 디렉토리 생성
-            default_dir_path = str(Path.home()) + "/Desktop/Anonytest/"
-            try:
-                os.mkdir(default_dir_path)
-            except FileExistsError:
-                pass
-
-            # 해당 재현데이터 디렉토리 생성
-            synfile_dir_path = default_dir_path + st.session_state.syn_file_name[:-4]
-            try:
-                os.mkdir(synfile_dir_path)
-            except FileExistsError:
-                pass
+            # column 전체가 같은 값을 가져서 drop되면 표시
+            reidentified_res.dataframe(syn_reidentified[:1000])
+            if dropped_cols:
+                drop_str = "모두 같은 값을 가져 drop된 속성: "
+                for i in range(len(dropped_cols)):
+                    if i != 0:
+                        drop_str += ", "
+                    drop_str += str(dropped_cols[i])
+                st.markdown("##### " + drop_str)
+            st.session_state.syn_reid_done = True
             
-            # metadata json 형태로 담을 dictionary
-            meta_dict = {
-                "dims_remaining": [],
-                "files_to_combine": [],
-                "reid_record": None,
-                "reid_rate": None,
-                "raw_data_attr_num" : None,
-                "raw_data_record_num": None,
-            }
+            # 재식별 데이터 저장 디렉토리 강제 생성
+            default_dir_path = str(Path.home()) + "/Desktop/Anonytest/"
+            synfile_dir_path = default_dir_path + st.session_state.syn_file_name[:-4]
+            self.create_dirs(default_dir_path, synfile_dir_path)
 
             # metadata 파일
+            # metadata json 형태로 담을 dictionary
+            # meta_dict = {
+            #     "dims_remaining": [],
+            #     "files_to_combine": [],
+            #     "reid_record": None,
+            #     "reid_rate": None,
+            #     "raw_data_attr_num" : None,
+            #     "raw_data_record_num": None,
+            # }
+
             json_file_path = synfile_dir_path + '/metadata.json'
             if os.path.exists(json_file_path):
                 # 추후 파일 업데이트
@@ -95,7 +100,6 @@ class syn_risk:
                 if len(syn_reidentified) > meta_dict["reid_record"]: meta_dict["reid_record"] = (len(syn_reidentified))
                 if reid_rate > meta_dict["reid_rate"]: meta_dict["reid_rate"] = (reid_rate)
                 meta_dict["files_to_combine"].append(str(dims[0]) + '_' + str(dims[1]))
-                st.write(meta_dict)
                 with open(json_file_path,'w',encoding = 'utf-8') as f:
                     f.write(json.dumps(meta_dict, indent=4))
             else:
@@ -109,7 +113,6 @@ class syn_risk:
                 meta_dict["raw_data_attr_num"] = len(st.session_state.raw_data.columns)
                 meta_dict["raw_data_record_num"] = len(st.session_state.raw_data)
                 meta_dict["files_to_combine"].append(str(dims[0]) + '_' + str(dims[1]))
-                st.write(meta_dict)
                 with open(json_file_path,'w',encoding = 'utf-8') as f:
                     f.write(json.dumps(meta_dict, indent=4))
  
@@ -120,15 +123,7 @@ class syn_risk:
                     f.write(str(convert_df2csv(syn_reidentified)))
                     st.success(f"재식별도 파일 다운로드 완료!  \n   {reid_file_path}")
 
-            reidentified_res.dataframe(syn_reidentified[:1000])
-            if dropped_cols:
-                drop_str = "모두 같은 값을 가져 drop된 속성: "
-                for i in range(len(dropped_cols)):
-                    if i != 0:
-                        drop_str += ", "
-                    drop_str += str(dropped_cols[i])
-                st.markdown("##### " + drop_str)
-            st.session_state.syn_reid_done = True
+            
 
     def syn_table(self):
         st.subheader('테이블 재식별 위험도')
@@ -202,3 +197,35 @@ class syn_risk:
             mime='text/csv',
         )
         st.dataframe(st.session_state.syn_record.round(decimals = 4).head(200))
+
+    def create_dirs(default_dir_path, synfile_dir_path):
+        # anonytester 기본 디렉토리 생성
+        try:
+            os.mkdir(default_dir_path)
+        except FileExistsError:
+            pass
+        
+        # 해당 재현데이터 디렉토리 생성
+        try:
+            os.mkdir(synfile_dir_path)
+        except FileExistsError:
+            pass
+
+
+    def reid_info(self):
+        st.header('재식별 데이터 계산 기록')
+        json_file_path = str(Path.home()) + "/Desktop/Anonytest/" + st.session_state.syn_file_name[:-4] + '/metadata.json'
+        if os.path.exists(json_file_path):
+            with open(json_file_path, 'r', encoding = 'utf-8') as f:
+                meta_dict = json.load(f)
+            st.markdown(f"""
+                #### 전체 디멘션 수: {meta_dict["raw_data_attr_num"]}  
+                ## 확인 필요 디멘션: {meta_dict["dims_remaining"][0]} 에서 {meta_dict["dims_remaining"][1]}  
+                #### 현재까지 재식별된 레코드 수: {meta_dict["reid_record"]}  
+                #### 현재까지 계산된 재식별도: {meta_dict["reid_rate"]:.3f}  
+                #### 생성된 재식별 데이터 파일 디멘션:
+            """)
+            for dim in meta_dict["files_to_combine"]:
+                st.write(dim)
+        else:
+            st.subheader("재식별도 계산 기록이 없습니다.")
