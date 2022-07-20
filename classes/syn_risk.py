@@ -79,14 +79,14 @@ class syn_risk:
 
             # metadata 파일
             # metadata json 형태로 담을 dictionary
-            # meta_dict = {
-            #     "dims_remaining": [],
-            #     "files_to_combine": [],
-            #     "reid_record": None,
-            #     "reid_rate": None,
-            #     "raw_data_attr_num" : None,
-            #     "raw_data_record_num": None,
-            # }
+            meta_dict = {
+                "dims_remaining": [],
+                "files_to_combine": [],
+                "reid_record": None,
+                "reid_rate": None,
+                "raw_data_attr_num" : None,
+                "raw_data_record_num": None,
+            }
 
             json_file_path = synfile_dir_path + '/metadata.json'
             if os.path.exists(json_file_path):
@@ -198,7 +198,7 @@ class syn_risk:
         )
         st.dataframe(st.session_state.syn_record.round(decimals = 4).head(200))
 
-    def create_dirs(default_dir_path, synfile_dir_path):
+    def create_dirs(self, default_dir_path, synfile_dir_path):
         # anonytester 기본 디렉토리 생성
         try:
             os.mkdir(default_dir_path)
@@ -222,7 +222,7 @@ class syn_risk:
                 #### 전체 디멘션 수: {meta_dict["raw_data_attr_num"]}  
                 ## 확인 필요 디멘션: {meta_dict["dims_remaining"][0]} 에서 {meta_dict["dims_remaining"][1]}  
                 #### 현재까지 재식별된 레코드 수: {meta_dict["reid_record"]}  
-                #### 현재까지 계산된 재식별도: {meta_dict["reid_rate"]:.3f}  
+                #### 현재까지 계산된 재식별도: {meta_dict["reid_rate"]:.3f} 
                 #### 생성된 재식별 데이터 파일 디멘션:
             """)
             for dim in meta_dict["files_to_combine"]:
