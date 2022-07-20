@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
 from pathlib import Path
+import json
 
 #functions
 from funcs.risk_syn import compute_risk
@@ -58,34 +59,68 @@ class syn_risk:
             reidentified_res.subheader(f"재식별된 레코드 수: {len(syn_reidentified)}")
 
             # anonytester 기본 디렉토리 생성
+            default_dir_path = str(Path.home()) + "/Desktop/Anonytest/"
             try:
-                os.mkdir(str(Path.home()) + "/Desktop/Anonytest")
+                os.mkdir(default_dir_path)
             except FileExistsError:
                 pass
 
             # 해당 재현데이터 디렉토리 생성
+            synfile_dir_path = default_dir_path + st.session_state.syn_file_name[:-4]
             try:
-                os.mkdir(str(Path.home()) + "/Desktop/Anonytest/" + st.session_state.syn_file_name[:-4])
+                os.mkdir(synfile_dir_path)
             except FileExistsError:
                 pass
-
-            # metadata 파일 생성
-            if os.path.exists(str(Path.home()) + "/Desktop/Anonytest/" + st.session_state.syn_file_name[:-4] + "/metadata.json"):
-                #TODO: implement updating json if exists
-                pass
-            else:
-                #TODO: implement creating json if not exist
-                pass
             
-            syn_reid_dir = st.text_input("재식별도 파일 다운로드할 경로를 입력해주세요")
-            if syn_reid_dir != "":
-                file_name=st.session_state.syn_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv'
-                f=open(syn_reid_dir + '/' + file_name, 'w', encoding='utf-8')
-                f.write(str(convert_df2csv(syn_reidentified)))
-                st.success("재식별도 파일 다운로드 완료")
-                f.close()
+            # metadata json 형태로 담을 dictionary
+            meta_dict = {
+                "dims_remaining": [],
+                "files_to_combine": [],
+                "reid_record": None,
+                "reid_rate": None,
+                "raw_data_attr_num" : None,
+                "raw_data_record_num": None,
+            }
 
-            reidentified_res.write(syn_reidentified[:1000])
+            # metadata 파일
+            json_file_path = synfile_dir_path + '/metadata.json'
+            if os.path.exists(json_file_path):
+                # 추후 파일 업데이트
+                with open(json_file_path, 'r', encoding = 'utf-8') as f:
+                    meta_dict = json.load(f)
+                if dims[1] == len(st.session_state.raw_data.columns):
+                    meta_dict["dims_remaining"] = [-1]  # 디멘션 전부 확인했을때 -1로 표시
+                else:
+                    meta_dict["dims_remaining"][0] = dims[1]+1
+                if len(syn_reidentified) > meta_dict["reid_record"]: meta_dict["reid_record"] = (len(syn_reidentified))
+                if reid_rate > meta_dict["reid_rate"]: meta_dict["reid_rate"] = (reid_rate)
+                meta_dict["files_to_combine"].append(str(dims[0]) + '_' + str(dims[1]))
+                st.write(meta_dict)
+                with open(json_file_path,'w',encoding = 'utf-8') as f:
+                    f.write(json.dumps(meta_dict, indent=4))
+            else:
+                # 파일 처음생성
+                if dims[1] == len(st.session_state.raw_data.columns):
+                    meta_dict["dims_remaining"] = [-1]  # 디멘션 전부 확인했을때 -1로 표시
+                else:
+                    meta_dict["dims_remaining"] = [dims[1]+1, len(st.session_state.raw_data.columns)]
+                meta_dict["reid_record"] = len(syn_reidentified)
+                meta_dict["reid_rate"] = reid_rate
+                meta_dict["raw_data_attr_num"] = len(st.session_state.raw_data.columns)
+                meta_dict["raw_data_record_num"] = len(st.session_state.raw_data)
+                meta_dict["files_to_combine"].append(str(dims[0]) + '_' + str(dims[1]))
+                st.write(meta_dict)
+                with open(json_file_path,'w',encoding = 'utf-8') as f:
+                    f.write(json.dumps(meta_dict, indent=4))
+ 
+            # 재식별 데이터 csv파일 자동 생성
+            reid_file_path = synfile_dir_path + '/' + st.session_state.syn_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv'
+            if not os.path.exists(reid_file_path):
+                with open(reid_file_path, 'w', encoding='utf-8') as f:
+                    f.write(str(convert_df2csv(syn_reidentified)))
+                    st.success(f"재식별도 파일 다운로드 완료!  \n   {reid_file_path}")
+
+            reidentified_res.dataframe(syn_reidentified[:1000])
             if dropped_cols:
                 drop_str = "모두 같은 값을 가져 drop된 속성: "
                 for i in range(len(dropped_cols)):
