@@ -45,40 +45,29 @@ class syn_risk:
         dims = col3.slider('재식별도 계산 Dimension을 선택',
                             1, len(st.session_state.raw_data.columns),(1, len(st.session_state.raw_data.columns)))
         record_num = col1.number_input("재식별 확인 레코드 수", min_value=-1, step=1, help="-1을 입력하시면 전체를 확인합니다.")
-        if "syn_reid_done" not in st.session_state:
-            st.session_state.syn_reid_done = False
+
+        # if "syn_reid_done" not in st.session_state:
+        #     st.session_state.syn_reid_done = False
+
         start_button = col1.form_submit_button("재식별도 계산 시작")
-        if start_button or st.session_state.syn_reid_done:
-            reidentified_res = st.container()
-            syn_reidentified, dropped_cols = syn_reidentified_datas(\
+        reidentified_res = st.container()
+
+        if start_button:
+            st.session_state.syn_reidentified, st.session_state.dropped_cols = syn_reidentified_datas(\
                 st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr,\
                 K=record_num,start_dim=dims[0],end_dim=dims[1])
+            # st.session_state.syn_reid_done = True
             # ------- 재식별도 계산 완료 -------
 
-            # 재식별도 관련 정보 표시
-            reid_rate = len(syn_reidentified)/len(st.session_state.syn_data)
-            reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
-            reidentified_res.subheader(f"재식별된 레코드 수: {len(syn_reidentified)}")
-
-            # column 전체가 같은 값을 가져서 drop되면 표시
-            if not syn_reidentified.empty:
-                reidentified_res.dataframe(syn_reidentified[:1000])
-            if dropped_cols:
-                drop_str = "모두 같은 값을 가져 drop된 속성: "
-                for i in range(len(dropped_cols)):
-                    if i != 0:
-                        drop_str += ", "
-                    drop_str += str(dropped_cols[i])
-                st.markdown("##### " + drop_str)
-            st.session_state.syn_reid_done = True
-            
             # 재식별 데이터 저장 디렉토리 강제 생성
             default_dir_path = str(Path.home()) + "/Desktop/Anonytest/"
             synfile_dir_path = default_dir_path + st.session_state.syn_file_name[:-4]
             self.create_dirs(default_dir_path, synfile_dir_path)
 
-            # metadata 파일
+            # metadata 파일 처리
             # metadata json 형태로 담을 dictionary
+            reid_record_num = len(st.session_state.syn_reidentified)
+            reid_rate = reid_record_num/len(st.session_state.syn_data)
             meta_dict = {
                 "dims_remaining": [],
                 "files_to_combine": [],
@@ -89,6 +78,8 @@ class syn_risk:
             }
 
             json_file_path = synfile_dir_path + '/metadata.json'
+            
+            # json 메타데이터 업데이트 재식별도 계산 시
             if os.path.exists(json_file_path):
                 # 추후 파일 업데이트
                 with open(json_file_path, 'r', encoding = 'utf-8') as f:
@@ -97,7 +88,7 @@ class syn_risk:
                     meta_dict["dims_remaining"] = [-1]  # 디멘션 전부 확인했을때 -1로 표시
                 else:
                     meta_dict["dims_remaining"][0] = dims[1]+1
-                if len(syn_reidentified) > meta_dict["reid_record"]: meta_dict["reid_record"] = (len(syn_reidentified))
+                if reid_record_num > meta_dict["reid_record"]: meta_dict["reid_record"] = (reid_record_num)
                 if reid_rate > meta_dict["reid_rate"]: meta_dict["reid_rate"] = (reid_rate)
                 meta_dict["files_to_combine"].append(str(dims[0]) + '_' + str(dims[1]))
                 with open(json_file_path,'w',encoding = 'utf-8') as f:
@@ -108,7 +99,7 @@ class syn_risk:
                     meta_dict["dims_remaining"] = [-1]  # 디멘션 전부 확인했을때 -1로 표시
                 else:
                     meta_dict["dims_remaining"] = [dims[1]+1, len(st.session_state.raw_data.columns)]
-                meta_dict["reid_record"] = len(syn_reidentified)
+                meta_dict["reid_record"] = reid_record_num
                 meta_dict["reid_rate"] = reid_rate
                 meta_dict["raw_data_attr_num"] = len(st.session_state.raw_data.columns)
                 meta_dict["raw_data_record_num"] = len(st.session_state.raw_data)
@@ -118,12 +109,30 @@ class syn_risk:
  
             # 재식별 데이터 csv파일 자동 생성
             reid_file_path = synfile_dir_path + '/' + st.session_state.syn_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv'
-            if syn_reidentified.empty:
-                st.success(f"재식별될 레코드가 없습니다!")
+            if st.session_state.syn_reidentified.empty:
+                st.success(f"재식별된 레코드가 없습니다!")
             elif not os.path.exists(reid_file_path):
                 with open(reid_file_path, 'w', encoding='utf-8') as f:
                     st.success(f"재식별도 파일 다운로드 완료!  \n   {reid_file_path}")
 
+        if "syn_reidentified" in st.session_state:
+            reid_record_num = len(st.session_state.syn_reidentified)
+            reid_rate = reid_record_num/len(st.session_state.syn_data)
+            # 재식별도 관련 정보 표시
+            reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
+            reidentified_res.subheader(f"재식별된 레코드 수: {len(st.session_state.syn_reidentified)}")
+
+            if not st.session_state.syn_reidentified.empty:
+                reidentified_res.dataframe(st.session_state.syn_reidentified[:1000])
+            # column 전체가 같은 값을 가져서 drop되면 표시
+            if st.session_state.dropped_cols:
+                drop_str = "모두 같은 값을 가져 drop된 속성: "
+                for i in range(len(st.session_state.dropped_cols)):
+                    if i != 0:
+                        drop_str += ", "
+                    drop_str += str(st.session_state.dropped_cols[i])
+                st.markdown("##### " + drop_str)
+            st.session_state.syn_reid_done = True
             
 
     def syn_table(self):

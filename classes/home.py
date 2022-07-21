@@ -1,10 +1,10 @@
 #modules
 import streamlit as st
 import pandas as pd
+import funcs.utility as util
 
 #functions
 from funcs.raw_reidentified import get_all_combinations
-from funcs.preprocessing import preprocessing_low, preprocessing_high, preprocessing_raw
 
 class home:
     def __init__(self):
@@ -27,7 +27,7 @@ class home:
         if (raw_data_file is not None) and ("raw_data" not in st.session_state):
             st.session_state.raw_file_name = str(raw_data_file.name)
             try:
-                st.session_state.raw_data  = load_data_raw(raw_data_file)
+                st.session_state.raw_data  = util.load_data_raw(raw_data_file)
             except ValueError as er:
                 st.error(f"ValueError {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n원본데이터인지 확인해주세요.")
 
@@ -36,7 +36,7 @@ class home:
             if raw_data_file.name != st.session_state.raw_file_name:
                 st.session_state.raw_file_name = str(raw_data_file.name)
                 try:
-                    st.session_state.raw_data  = load_data_raw(raw_data_file)
+                    st.session_state.raw_data  = util.load_data_raw(raw_data_file)
                 except ValueError as er:
                     st.error(f"ValueError {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n원본데이터인지 확인해주세요.")
 
@@ -81,10 +81,10 @@ class home:
                 try:
                     if st.session_state.syn_data_lev == "고수준":
                         with st.spinner("고수준 재현데이터 전처리중..."):
-                            st.session_state.syn_data = load_data_syn_high(syn_data_file)
+                            st.session_state.syn_data = util.load_data_syn_high(syn_data_file)
                     elif st.session_state.syn_data_lev == "저수준":
                         with st.spinner("저수준 재현데이터 전처리중..."):
-                            st.session_state.syn_data = load_data_syn_low(syn_data_file)
+                            st.session_state.syn_data = util.load_data_syn_low(syn_data_file)
                     st.experimental_rerun()
                 except KeyError as er:
                     st.error(f"KeyError: {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n재현데이터인지 확인해주세요.")
@@ -101,10 +101,10 @@ class home:
                     try:
                         if st.session_state.syn_data_lev == "고수준":
                             with st.spinner("고수준 재현데이터 전처리중..."):
-                                st.session_state.syn_data  = load_data_syn_high(syn_data_file)
+                                st.session_state.syn_data  = util.load_data_syn_high(syn_data_file)
                         elif st.session_state.syn_data_lev == "저수준":
                             with st.spinner("저수준 재현데이터 전처리중..."):
-                                st.session_state.syn_data  = load_data_syn_low(syn_data_file)
+                                st.session_state.syn_data  = util.load_data_syn_low(syn_data_file)
                         st.experimental_rerun()
                     except KeyError as er:
                         st.error(f"KeyError: {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n재현데이터인지 확인해주세요.")
@@ -135,23 +135,3 @@ class home:
                     \n속성 수: {len(st.session_state.syn_data.columns)}\
                     \n속성 조합 수 {st.session_state.syn_comb_num}")
                 st.dataframe(st.session_state.syn_data[:1000])
-
-
-#cache functions
-def load_data_raw(file):
-    df = pd.read_csv(file, encoding='utf-8')
-    df = preprocessing_raw(df)
-    return df
-
-def load_data_syn_high(file):
-    df = pd.read_csv(file, encoding='utf-8')
-    df = preprocessing_high(df)
-    return df
-
-def load_data_syn_low(file):
-    df = pd.read_csv(file, encoding='utf-8')
-    df = preprocessing_low(df)
-    return df
-
-def to_str(drop_list):
-    return ", ".join(drop_list)

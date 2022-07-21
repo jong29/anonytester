@@ -1,5 +1,5 @@
 import pandas as pd
-import streamlit as st
+import funcs.preprocessing as pre
 
 #utility functions
 
@@ -22,3 +22,21 @@ def combine_dims_recur(dim_list):
         dim_list.insert(0, comb)
         combine_dims_recur(dim_list)
     return dim_list
+
+def load_data_raw(file):
+    df = pd.read_csv(file, encoding='utf-8')
+    df = pre.preprocessing_raw(df)
+    return df
+
+def load_data_syn_high(file):
+    df = pd.read_csv(file, encoding='utf-8')
+    df = pre.preprocessing_high(df)
+    return df
+
+def load_data_syn_low(file):
+    df = pd.read_csv(file, encoding='utf-8')
+    df = pre.preprocessing_low(df)
+    return df
+
+def to_str(drop_list):
+    return ", ".join(drop_list)
