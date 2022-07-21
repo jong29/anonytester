@@ -35,6 +35,7 @@ class home:
         if raw_data_file is not None:
             if raw_data_file.name != st.session_state.raw_file_name:
                 st.session_state.raw_file_name = str(raw_data_file.name)
+                st.session_state.drop_raw_disp = list()
                 try:
                     st.session_state.raw_data  = util.load_data_raw(raw_data_file)
                 except ValueError as er:
@@ -92,6 +93,7 @@ class home:
         # consecutive uploads
         if syn_data_file is not None:
             if syn_data_file.name != st.session_state.syn_file_name:
+                st.session_state.drop_syn_disp = list()
                 lev_select = col2.form("syn_lev")
                 st.session_state.syn_data_lev = lev_select.radio("재현데이터 수준선택", ("고수준", "저수준"), horizontal=True)
                 lev_selected = lev_select.form_submit_button("다음")
