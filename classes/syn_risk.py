@@ -21,10 +21,8 @@ class syn_risk:
                     st.session_state.syn_single_attr, st.session_state.syn_one_attr, st.session_state.syn_record, st.session_state.syn_table \
                         = compute_risk(st.session_state.syn_data.copy())
 
-            tab0, tab1, tab2, tab3, tab4, tab5 = st.tabs(["재현데이터 계산 정보" ,"재현 재식별도", "테이블 재식별 위험도", "속성 재식별 위험도", "속성값 재식별 위험도", "레코드 재식별 위험도"])
+            tab1, tab2, tab3, tab4, tab5 = st.tabs(["재현 재식별도", "테이블 재식별 위험도", "속성 재식별 위험도", "속성값 재식별 위험도", "레코드 재식별 위험도"])
 
-            with tab0:
-                self.reid_info()
             with tab1:
                 self.syn_reid()
             with tab2:
@@ -40,7 +38,8 @@ class syn_risk:
             
 
     def syn_reid(self):
-        st.subheader("재현데이터 재식별도")
+        self.reid_info()
+        st.header("재현데이터 재식별도")
         start_cont = st.form("reid_calc")
         col0, col1, col2, col3, col4 = start_cont.columns([0.3, 5, 1, 20, 1])
         dims = col3.slider('재식별도 계산 Dimension을 선택',
@@ -62,7 +61,8 @@ class syn_risk:
             reidentified_res.subheader(f"재식별된 레코드 수: {len(syn_reidentified)}")
 
             # column 전체가 같은 값을 가져서 drop되면 표시
-            reidentified_res.dataframe(syn_reidentified[:1000])
+            if not syn_reidentified.empty:
+                reidentified_res.dataframe(syn_reidentified[:1000])
             if dropped_cols:
                 drop_str = "모두 같은 값을 가져 drop된 속성: "
                 for i in range(len(dropped_cols)):
@@ -118,9 +118,10 @@ class syn_risk:
  
             # 재식별 데이터 csv파일 자동 생성
             reid_file_path = synfile_dir_path + '/' + st.session_state.syn_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv'
-            if not os.path.exists(reid_file_path):
+            if syn_reidentified.empty:
+                st.success(f"재식별될 레코드가 없습니다!")
+            elif not os.path.exists(reid_file_path):
                 with open(reid_file_path, 'w', encoding='utf-8') as f:
-                    f.write(str(convert_df2csv(syn_reidentified)))
                     st.success(f"재식별도 파일 다운로드 완료!  \n   {reid_file_path}")
 
             
@@ -213,19 +214,25 @@ class syn_risk:
 
 
     def reid_info(self):
-        st.header('재식별 데이터 계산 기록')
+        st.subheader('재식별 데이터 검사 기록')
         json_file_path = str(Path.home()) + "/Desktop/Anonytest/" + st.session_state.syn_file_name[:-4] + '/metadata.json'
         if os.path.exists(json_file_path):
             with open(json_file_path, 'r', encoding = 'utf-8') as f:
                 meta_dict = json.load(f)
+            if meta_dict["dims_remaining"][0] == -1:
+                st.markdown('<h2 style="color: IndianRed; font-weight:bold;"> 전체 디멘션 계산 완료했습니다</h2>', unsafe_allow_html=True)
+            else:
+                st.markdown(f'<h2 style="color: IndianRed; font-weight:bold;"> 계산 되지 않은 디멘션: {meta_dict["dims_remaining"][0]} 에서 {meta_dict["dims_remaining"][1]}</h2>', unsafe_allow_html=True)
+
             st.markdown(f"""
-                #### 전체 디멘션 수: {meta_dict["raw_data_attr_num"]}  
-                ## 확인 필요 디멘션: {meta_dict["dims_remaining"][0]} 에서 {meta_dict["dims_remaining"][1]}  
-                #### 현재까지 재식별된 레코드 수: {meta_dict["reid_record"]}  
-                #### 현재까지 계산된 재식별도: {meta_dict["reid_rate"]:.3f} 
-                #### 생성된 재식별 데이터 파일 디멘션:
-            """)
+                <div>
+                    <p style="font-size:18px;"> 전체 디멘션 수: {meta_dict["raw_data_attr_num"]} </p>
+                    <p style="font-size:18px;"> 현재까지 재식별된 레코드 수: {meta_dict["reid_record"]} </p>
+                    <p style="font-size:18px;"> 현재까지 계산된 재식별도: {meta_dict["reid_rate"]:.3f} </p>
+                    <p style="font-size:18px;"> 검사 완료한 재식별 데이터 디멘션: </p>
+                </div>
+            """, unsafe_allow_html=True)
             for dim in meta_dict["files_to_combine"]:
                 st.write(dim)
         else:
-            st.subheader("재식별도 계산 기록이 없습니다.")
+            st.markdown('<p style="color: grey; font-size: 22px; font-weight: bold">재식별도 검사 기록이 없습니다</p>', unsafe_allow_html=True)
