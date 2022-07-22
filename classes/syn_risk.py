@@ -81,10 +81,10 @@ class syn_risk:
             
             # json 메타데이터 업데이트 재식별도 계산 시
             if os.path.exists(json_file_path):
-                # 추후 파일 업데이트
+                # 메타데이터 파일 업데이트
                 with open(json_file_path, 'r', encoding = 'utf-8') as f:
                     meta_dict = json.load(f)
-                if dims[1] == len(st.session_state.raw_data.columns):
+                if dims[1] == len(st.session_state.raw_data.columns): # 모든 디멘션 검사 후 또 검사하면 index out of range error
                     meta_dict["dims_remaining"] = [-1]  # 디멘션 전부 확인했을때 -1로 표시
                 else:
                     meta_dict["dims_remaining"][0] = dims[1]+1
@@ -94,7 +94,7 @@ class syn_risk:
                 with open(json_file_path,'w',encoding = 'utf-8') as f:
                     f.write(json.dumps(meta_dict, indent=4))
             else:
-                # 파일 처음생성
+                # 메타데이터 파일 생성
                 if dims[1] == len(st.session_state.raw_data.columns):
                     meta_dict["dims_remaining"] = [-1]  # 디멘션 전부 확인했을때 -1로 표시
                 else:
@@ -112,9 +112,9 @@ class syn_risk:
             if st.session_state.syn_reidentified.empty:
                 st.success(f"재식별된 레코드가 없습니다!")
             elif not os.path.exists(reid_file_path):
-                with open(reid_file_path, 'w', encoding='utf-8') as f:
+                with open(reid_file_path, 'w', encoding='utf-8-sig', newline='') as f:
+                    st.session_state.syn_reidentified.to_csv(f)
                     st.success(f"재식별도 파일 다운로드 완료!  \n   {reid_file_path}")
-
         if "syn_reidentified" in st.session_state:
             reid_record_num = len(st.session_state.syn_reidentified)
             reid_rate = reid_record_num/len(st.session_state.syn_data)

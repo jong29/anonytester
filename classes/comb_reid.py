@@ -9,9 +9,9 @@ class comb_reid:
         # files.sort(key=dimsort)
         file_list = list()
         if len(files) >= 2:
-            st.write(files)
             for file in files:
                 file_list.append(pd.read_csv(file))
+            st.write(file_list)
             combined = combine_dims_recur(file_list)
             st.write(combined[0])
             combined_file = convert_df2csv(combined[0])
