@@ -9,15 +9,13 @@ class comb_reid:
         # files.sort(key=dimsort)
         file_list = list()
         if len(files) >= 2:
+            files.sort(key=lambda x:x.name)
             for file in files:
                 file_list.append(pd.read_csv(file))
-            st.write(file_list)
+            # 재귀적으로 디멘션별로 결합
             combined = combine_dims_recur(file_list)
-            st.write(combined[0])
-            combined_file = convert_df2csv(combined[0])
+            comb_df = comb_org(combined[0])
+            st.write(comb_df)
+            combined_file = convert_df2csv(comb_df)
             st.download_button("결합된 재식별데이터 다운로드", combined_file, "결합재식별데이터.csv")
             st.markdown(f"### 재식별된 레코드: {len(combined[0])}")
-
-
-# def dimsort(file):
-#     return file.name[]

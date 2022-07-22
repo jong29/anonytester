@@ -115,6 +115,7 @@ class syn_risk:
                 with open(reid_file_path, 'w', encoding='utf-8-sig', newline='') as f:
                     st.session_state.syn_reidentified.to_csv(f)
                     st.success(f"재식별도 파일 다운로드 완료!  \n   {reid_file_path}")
+        
         if "syn_reidentified" in st.session_state:
             reid_record_num = len(st.session_state.syn_reidentified)
             reid_rate = reid_record_num/len(st.session_state.syn_data)
@@ -123,7 +124,9 @@ class syn_risk:
             reidentified_res.subheader(f"재식별된 레코드 수: {len(st.session_state.syn_reidentified)}")
 
             if not st.session_state.syn_reidentified.empty:
-                reidentified_res.dataframe(st.session_state.syn_reidentified[:1000])
+                with reidentified_res.expander("재식별된 레코드 확인"):
+                    st.dataframe(st.session_state.syn_reidentified[:1000])
+            
             # column 전체가 같은 값을 가져서 drop되면 표시
             if st.session_state.dropped_cols:
                 drop_str = "모두 같은 값을 가져 drop된 속성: "

@@ -23,6 +23,11 @@ def combine_dims_recur(dim_list):
         combine_dims_recur(dim_list)
     return dim_list
 
+def comb_org(df2org):
+    df2org.sort_values('abst_row_num__', inplace=True, ignore_index=True)
+    df2org.drop('Unnamed: 0', axis=1, inplace=True)
+    return df2org
+
 def load_data_raw(file):
     df = pd.read_csv(file, encoding='utf-8')
     df = pre.preprocessing_raw(df)
