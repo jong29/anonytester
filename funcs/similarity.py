@@ -34,7 +34,7 @@ def category_similarity_revised(vec, distinct):
     else:
         return round(1-(syn_connected/distinct),3)
     
-def val_simiarlity(raw_data, syn_data):
+def val_similarity(raw_data, syn_data):
     #========================특성 유사도========================
     raw_cols = list(raw_data.columns)
     similarity_df = pd.merge(raw_data,syn_data, left_index=True, right_index=True, how="inner")
@@ -95,7 +95,7 @@ def table_similarity(record_similarity_df):
 
 @st.cache(show_spinner=False)
 def similarity(raw_data, syn_data):
-    val_similarity_df = val_simiarlity(raw_data,syn_data)
+    val_similarity_df = val_similarity(raw_data,syn_data)
     attr_similarity_df = attr_simiarlity(val_similarity_df)
     record_similarity_df = record_similarity(val_similarity_df)
     table_similarity_df = table_similarity(record_similarity_df)

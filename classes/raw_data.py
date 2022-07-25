@@ -13,10 +13,10 @@ from funcs.raw_reidentified import raw_reidentified_datas
 class raw_data:
     def __init__(self):
         if "raw_data" in st.session_state:
-            if("raw_single_attr" not in st.session_state):
-                with st.spinner("데이터 로딩중..."):
-                    st.session_state.raw_single_attr, st.session_state.raw_one_attr, st.session_state.raw_record, st.session_state.raw_table \
-                        = compute_risk(st.session_state.raw_data.copy())
+            # if("raw_single_attr" not in st.session_state):
+            with st.spinner("데이터 로딩중..."):
+                st.session_state.raw_single_attr, st.session_state.raw_one_attr, st.session_state.raw_record, st.session_state.raw_table \
+                    = compute_risk(st.session_state.raw_data.copy())
 
             tab1, tab2, tab3, tab4, tab5 = st.tabs(["원본 재식별도", "테이블 재식별 위험도", "속성 재식별 위험도", "속성값 재식별 위험도", "레코드 재식별 위험도"])
 
