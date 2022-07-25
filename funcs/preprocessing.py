@@ -33,7 +33,7 @@ def preprocess_highlevel_df(syn_data):
     preprocessed_syn_data=pd.DataFrame()
     ##### 고수준 json 처리
     for c in syn_cols:
-        preprocessed_syn_data[c] = syn_data[c].apply(preprocess_json)
+        preprocessed_syn_data[c] = syn_data[c].apply(preprocess_json_new)
     return preprocessed_syn_data
 
 #====================================저수준 전처리=============================
@@ -44,6 +44,7 @@ def preprocessing_low(low_data):
     low_data.columns = low_data.columns.str.lower()
     return low_data
 
+# 가장 높은 ratio의 속성 값 리턴
 def preprocess_json(x):
     if(str(x)[0]=="["):
         dic=literal_eval(x)
@@ -56,11 +57,27 @@ def preprocess_json(x):
             x=tmp_name
     return x
     
+# ratio 값이 2개 이상이면 연결형, 아니면 최빈값 형태로 반환
+def preprocess_json_new(x):
+    if(str(x)[0]=="["):
+        val_list = literal_eval(x)
+        if(len(val_list)==1):
+            return val_list[0]['name']
+        else:
+            connected = ''
+            connected += val_list[0]['name']
+            for i in range(1,len(val_list)):
+                connected += '/ '
+                connected += val_list[i]['name']
+            return connected
+    else:
+        return x
+
 def preprocess_lowlevel_df(syn_data):
     syn_cols = list(syn_data.columns)
     preprocessed_syn_data=pd.DataFrame()
     for c in syn_cols:
-        preprocessed_syn_data[c] = syn_data[c].apply(preprocess_json)
+        preprocessed_syn_data[c] = syn_data[c].apply(preprocess_json_new)
     return preprocessed_syn_data
 
 def remove_unneccessary_columns(syn_data):
