@@ -18,7 +18,7 @@ def category_similarity(vec):
         if(raw_cate == syn_cate):
             return 1
         else:
-            return 0
+            return 0 ### -> groupby heirarchy goes here
     else:
         return round((1/(syn_connected+1)),2)
 
@@ -41,8 +41,8 @@ def val_similarity(raw_data, syn_data):
     for col in raw_cols:
         #type 맞춤 작업
         try:
-            similarity_df[col+"_x"] = similarity_df[col+"_x"].astype("float")
             similarity_df[col+"_y"] = similarity_df[col+"_y"].astype("float")    
+            similarity_df[col+"_x"] = similarity_df[col+"_x"].astype("float")
         except:
             similarity_df[col+"_x"] = similarity_df[col+"_x"].astype("str")
             similarity_df[col+"_y"] = similarity_df[col+"_y"].astype("str")
