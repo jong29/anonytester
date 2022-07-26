@@ -20,8 +20,11 @@ def single_attr_value_risk(dataframe):
 def one_attr_risk(single_attr_value_risk):
     # single_attr_value_risk['속성 값 재식별 위험도'] = single_attr_value_risk['속성 값 재식별 위험도'].astype(int)
     one_attr_risk_table = single_attr_value_risk.pivot_table(index='속성',\
-                                                                values=['속성 값 재식별 위험도'],\
-                                                                  aggfunc=['mean','std','max','min'])
+                                                            values=['속성 값 재식별 위험도'],\
+                                                            aggfunc=['mean','std','max','min'],\
+                                                            dropna=False)
+    # 모든 속성 재식별 위험도가 0일때 표준편차가 NaN으로 나옴
+    one_attr_risk_table['std'] = one_attr_risk_table['std'].fillna(0)
     one_attr_risk_table.columns = ['mean','std','max','min']
     one_attr_risk_table = one_attr_risk_table.sort_values('mean',ascending=False)
     return one_attr_risk_table
