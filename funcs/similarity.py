@@ -18,7 +18,7 @@ def category_similarity(vec):
         if(raw_cate == syn_cate):
             return 1
         else:
-            return 0 ### -> groupby heirarchy goes here
+            return 0 
     else:
         return round((1/(syn_connected+1)),2)
 
@@ -30,10 +30,14 @@ def category_similarity_revised(vec, distinct):
         if(raw_cate == syn_cate):
             return 1
         else:
-            return 0
+            heirarchical_grouby()
+            return 0 ### -> groupby heirarchy goes here
     else:
         return round(1-(syn_connected/distinct),3)
     
+def heirarchical_grouby():
+    pass
+
 def val_similarity(raw_data, syn_data):
     #========================특성 유사도========================
     raw_cols = list(raw_data.columns)

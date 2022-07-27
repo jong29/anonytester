@@ -1,7 +1,9 @@
 import pandas as pd
 from ast import literal_eval
 from joblib import Parallel, delayed
+from requests import JSONDecodeError
 import streamlit as st
+import json
 
 #====================================원본 전처리=============================
 """
@@ -33,6 +35,12 @@ def preprocess_highlevel_df(syn_data):
     preprocessed_syn_data=pd.DataFrame()
     ##### 고수준 json 처리
     for c in syn_cols:
+        # try:
+        #     preprocessed_syn_data[c] = syn_data[c].apply(preprocess_json_new)
+        # except TypeError as e:
+        #     print("\n\n\n!!!!!DEBUGGING....")
+        #     print(c)
+        #     raise(TypeError)
         preprocessed_syn_data[c] = syn_data[c].apply(preprocess_json_new)
     return preprocessed_syn_data
 
@@ -59,19 +67,34 @@ def preprocess_json(x):
     
 # ratio 값이 2개 이상이면 연결형, 아니면 최빈값 형태로 반환
 def preprocess_json_new(x):
-    if(str(x)[0]=="["):
+    if(validateJSON(x)):
         val_list = literal_eval(x)
-        if(len(val_list)==1):
-            return val_list[0]['name']
-        else:
-            connected = ''
-            connected += val_list[0]['name']
-            for i in range(1,len(val_list)):
-                connected += '/ '
-                connected += val_list[i]['name']
-            return connected
+        try: #int가 json으로 인식되는 경우에 dict로 처리하지 않고 바로 int 그대로 반환
+            if(len(val_list)==1):
+                return val_list[0]['name']
+            else:
+                connected = ''
+                connected += val_list[0]['name']
+                for i in range(1,len(val_list)):
+                    connected += '/ '
+                    connected += val_list[i]['name']
+                return connected
+        except TypeError:
+            return x
     else:
         return x
+
+# ratio parsing 위해 json형태인지 확인
+def validateJSON(jsonData):
+    try:
+        json.loads(jsonData)
+    except ValueError as Verr:
+        return False
+    except TypeError as Terr:
+        return False
+    except JSONDecodeError as Jerr:
+        return False
+    return True
 
 def preprocess_lowlevel_df(syn_data):
     syn_cols = list(syn_data.columns)
