@@ -42,7 +42,7 @@ class syn_use:
             file_name=st.session_state.syn_file_name[:-4] + '_속성유사도.csv',
             mime='text/csv',
         )
-
+    
     def record_sim(self):
         st.markdown("### 레코드 유사도")
         st.dataframe(st.session_state.record_similarity.round(decimals = 3).head(200))

@@ -30,13 +30,31 @@ def category_similarity_revised(vec, distinct):
         if(raw_cate == syn_cate):
             return 1
         else:
-            heirarchical_grouby()
+            heirarchical_groupby()
             return 0 ### -> groupby heirarchy goes here
     else:
         return round(1-(syn_connected/distinct),3)
     
-def heirarchical_grouby():
-    pass
+def heirarchical_groupby(raw_data, syn_data, similarity_df, category_cols):
+    
+    # 임의 계층 구조 테이블 생성하기 위해 재현데이터 속성값이
+    # 원본데이터에 존재하지 않는것을 비교 확인하기 위해 원본 재현성값
+    # distinct value dictionary 생성
+    raw_distinct, syn_distinct = dict(), dict()
+    for col in category_cols:
+        raw_distinct[col]= raw_data[col].unique().tolist()
+        syn_distinct[col]= syn_data[col].unique().tolist()
+    print(f"raw: {raw_distinct}")
+    print(f"synb4: {syn_distinct}")
+    # 원본데이터에 속성값이 존재하지 않아 계층구조 상승을 의미할때
+    # 몇개 원본 속성을 포함하는지 찾기 위해 groupby해서 확인
+    for attr in syn_distinct:
+        for val in syn_distinct[attr]:
+            if val in raw_distinct[attr]:
+                syn_distinct[attr].remove(val)
+                
+    print(f"synaf: {syn_distinct}")
+#     similarity_df.loc[similarity_df[]]
 
 def val_similarity(raw_data, syn_data):
     #========================특성 유사도========================
@@ -66,6 +84,9 @@ def val_similarity(raw_data, syn_data):
                                                                   args=(similarity_df[col+"_x"].max(),similarity_df[col+"_x"].min()), axis=1)
     for col in category_cols:
         similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(category_similarity_revised, args=[similarity_df[col+"_x"].nunique()], axis=1)
+
+    #groupby heirarchy
+    similarity_df = heirarchical_groupby(raw_data, similarity_df, category_cols)
 
     similarity_df = similarity_df[raw_cols]
     return similarity_df
