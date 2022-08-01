@@ -8,7 +8,7 @@ from funcs.raw_reidentified import get_all_combinations
 
 class home:
     def __init__(self):
-        st.write("# 재현데이터 평가도구 ANONY TESTER")
+        # st.write("# 재현데이터 평가도구 ANONY TESTER")
         st.markdown(
             """
             Anony Tester는 재현데이터의 안정성 및 유용성 지표를 평가합니다.
