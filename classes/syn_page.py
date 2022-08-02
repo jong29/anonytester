@@ -12,7 +12,7 @@ from funcs.risk_syn import compute_risk
 from funcs.utility import convert_df2csv
 from funcs.synthetic_reidentified import syn_reidentified_datas
 
-class syn_risk:
+class syn_page:
     def __init__(self):
         if ("syn_data" in st.session_state) and ("raw_data" in st.session_state):
             if "syn_single_attr" not in st.session_state:

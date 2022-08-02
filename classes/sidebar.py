@@ -1,10 +1,10 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from classes.raw_data import raw_data
-from classes.syn_risk import syn_risk
+from classes.raw_page import raw_page
+from classes.syn_page import syn_page
 from classes.home import home
 from classes.comb_reid import comb_reid
-from classes.syn_use import syn_use
+from classes.sim_page import sim_page
 
 class SideBar:
     def __init__(self):
@@ -27,11 +27,11 @@ class SideBar:
         if selected == "Home":
             home()
         if selected == "원본데이터":
-            raw_data()
+            raw_page()
         if selected == "재현데이터":
-            syn_risk()
+            syn_page()
         if selected == "유사도": 
-            syn_use()
+            sim_page()
         if selected == '재식별도 결합':
             comb_reid()
     

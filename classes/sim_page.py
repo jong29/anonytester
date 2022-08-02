@@ -2,7 +2,7 @@ import streamlit as st
 from funcs.similarity import similarity
 from funcs.utility import convert_df2csv
 
-class syn_use:
+class sim_page:
     def __init__(self):
         if ("syn_data" in st.session_state) and ("raw_data" in st.session_state):
             if "val_similarity" not in st.session_state:

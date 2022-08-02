@@ -10,7 +10,7 @@ from funcs.utility import convert_df2csv
 from funcs.raw_reidentified import raw_reidentified_datas
 
 
-class raw_data:
+class raw_page:
     def __init__(self):
         if "raw_data" in st.session_state:
             # if("raw_single_attr" not in st.session_state):
