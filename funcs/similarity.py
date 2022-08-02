@@ -10,7 +10,7 @@ def numeric_similarity(vec ,max_val ,min_val):
     syn_val= vec[1]
     return 1-(abs(raw_val-syn_val)/(max_val-min_val))
 
-def category_similarity(vec):
+def category_similarity(vec, distinct):
     raw_cate     = vec[0]
     syn_cate     = vec[1]
     syn_connected = syn_cate.count(delimiter)
@@ -18,24 +18,23 @@ def category_similarity(vec):
         if(raw_cate == syn_cate):
             return 1
         else:
-            return 0 
-    else:
-        return round((1/(syn_connected+1)),2)
-
-def category_similarity_revised(vec, distinct):
-    raw_cate     = vec[0]
-    syn_cate     = vec[1]
-    syn_connected = syn_cate.count(delimiter)
-    if(syn_connected == 0):
-        if(raw_cate == syn_cate):
-            return 1
-        else:
-            return 0 ### -> hierarchy check goes here ++ should have alternate version after checking for 계층구조 상승
+            return 0
     else:
         return round(1-(syn_connected/distinct),3)
     
+def category_similarity_hier(vec, distinct, column_name, hierarchy_table):
+    raw_cate     = vec[0]
+    syn_cate     = vec[1]
+    syn_connected = syn_cate.count(delimiter)
+    if(syn_connected == 0):
+        if(raw_cate == syn_cate):
+            return 1
+        else:
+            return round(1-((hierarchy_table[column_name][syn_cate]-1)/distinct),3)
+    else:
+        return round(1-(syn_connected/distinct),3)
+
 def hierarchy_groupby(raw_data, syn_data, similarity_df, category_cols):
-    
     # 임의 계층 구조 테이블 생성하기 위해 재현데이터 속성값이
     # 원본데이터에 존재하지 않는것을 비교 확인하기 위해 원본 재현성값
     # distinct value dictionary 생성
@@ -43,6 +42,7 @@ def hierarchy_groupby(raw_data, syn_data, similarity_df, category_cols):
     for col in category_cols:
         raw_distinct[col]= raw_data[col].unique().tolist()
         syn_distinct[col]= syn_data[col].unique().tolist()
+    
     # 원본데이터에 속성값이 존재하지 않아 계층구조 상승을 의미할때
     # 몇개 원본 속성을 포함하는지 찾기 위해 groupby해서 확인
     for attr in syn_distinct:
@@ -64,7 +64,7 @@ def hierarchy_groupby(raw_data, syn_data, similarity_df, category_cols):
     
     return syn_distinct
 
-def val_similarity(raw_data, syn_data):
+def val_similarity(raw_data, syn_data, apply_hierarchy=True):
     #========================특성 유사도========================
     raw_cols = list(raw_data.columns)
     similarity_df = pd.merge(raw_data,syn_data, left_index=True, right_index=True, how="inner")
@@ -87,14 +87,21 @@ def val_similarity(raw_data, syn_data):
         category_cols[idx] = category_cols[idx][:-2]
     category_cols = set(category_cols)
 
-    for col in numeric_cols:
-        similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(numeric_similarity, \
-                                                                  args=(similarity_df[col+"_x"].max(),similarity_df[col+"_x"].min()), axis=1)
-    for col in category_cols:
-        similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(category_similarity_revised, args=[similarity_df[col+"_x"].nunique()], axis=1)
-
-    #groupby heirarchy
-    heirarchy_df = hierarchy_groupby(raw_data, similarity_df, category_cols)
+    #apply groupby hierarchy:
+    if apply_hierarchy:
+        #groupby heirarchy
+        hierarchy_df = hierarchy_groupby(raw_data, syn_data, similarity_df, category_cols)
+        for col in numeric_cols:
+            similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(numeric_similarity, \
+                                                                    args=(similarity_df[col+"_x"].max(),similarity_df[col+"_x"].min()), axis=1)
+        for col in category_cols:
+            similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(category_similarity_hier, args=[similarity_df[col+"_x"].nunique(), col, hierarchy_df], axis=1)
+    else:
+        for col in numeric_cols:
+            similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(numeric_similarity, \
+                                                                    args=(similarity_df[col+"_x"].max(),similarity_df[col+"_x"].min()), axis=1)
+        for col in category_cols:
+            similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(category_similarity, args=[similarity_df[col+"_x"].nunique()], axis=1)
 
     similarity_df = similarity_df[raw_cols]
     return similarity_df
