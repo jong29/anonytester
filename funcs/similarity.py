@@ -1,5 +1,9 @@
+from time import time
 import pandas as pd
 import streamlit as st
+from stqdm import stqdm
+import timeit
+
 
 #전역변수 구분자
 delimiter = '/'
@@ -63,11 +67,15 @@ def hierarchy_groupby(raw_data, syn_data, similarity_df, category_cols):
         syn_distinct[attr] = child_count
     
     return syn_distinct
-
-def val_similarity(raw_data, syn_data, apply_hierarchy=True):
+    
+def val_similarity(raw_data, syn_data, apply_hierarchy=False):
     #========================특성 유사도========================
+    start = timeit.default_timer()
     raw_cols = list(raw_data.columns)
     similarity_df = pd.merge(raw_data,syn_data, left_index=True, right_index=True, how="inner")
+
+    # for comb in loop:
+    
     for col in raw_cols:
         #type 맞춤 작업
         try:
@@ -91,17 +99,25 @@ def val_similarity(raw_data, syn_data, apply_hierarchy=True):
     if apply_hierarchy:
         #groupby heirarchy
         hierarchy_df = hierarchy_groupby(raw_data, syn_data, similarity_df, category_cols)
-        for col in numeric_cols:
-            similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(numeric_similarity, \
-                                                                    args=(similarity_df[col+"_x"].max(),similarity_df[col+"_x"].min()), axis=1)
-        for col in category_cols:
-            similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(category_similarity_hier, args=[similarity_df[col+"_x"].nunique(), col, hierarchy_df], axis=1)
+        with st.spinner("수치형 데이터 계산중..."):
+            num_loop = stqdm(list(numeric_cols))
+            for col in num_loop:
+                similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(numeric_similarity, \
+                                                                        args=(similarity_df[col+"_x"].max(),similarity_df[col+"_x"].min()), axis=1)
+        with st.spinner("범주형 데이터 계산중..."):
+            cat_loop = stqdm(list(category_cols))
+            for col in cat_loop:
+                similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(category_similarity_hier, args=[similarity_df[col+"_x"].nunique(), col, hierarchy_df], axis=1)
     else:
-        for col in numeric_cols:
-            similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(numeric_similarity, \
-                                                                    args=(similarity_df[col+"_x"].max(),similarity_df[col+"_x"].min()), axis=1)
-        for col in category_cols:
-            similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(category_similarity, args=[similarity_df[col+"_x"].nunique()], axis=1)
+        with st.spinner("수치형 데이터 계산중..."):
+            num_loop = stqdm(list(numeric_cols))
+            for col in num_loop:
+                similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(numeric_similarity, \
+                                                                        args=(similarity_df[col+"_x"].max(),similarity_df[col+"_x"].min()), axis=1)
+        with st.spinner("범주형 데이터 계산중..."):
+            cat_loop = stqdm(list(category_cols))
+            for col in cat_loop:
+                similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(category_similarity, args=[similarity_df[col+"_x"].nunique()], axis=1)
 
     similarity_df = similarity_df[raw_cols]
     return similarity_df
@@ -133,9 +149,9 @@ def table_similarity(record_similarity_df):
                                     columns = ['mean', 'std', 'max', 'min']) 
     return table_similarity_df
 
-@st.cache(show_spinner=False)
-def similarity(raw_data, syn_data):
-    val_similarity_df = val_similarity(raw_data,syn_data)
+@st.cache(show_spinner=False, suppress_st_warning=True)
+def similarity(raw_data, syn_data, apply_hierarchy):
+    val_similarity_df = val_similarity(raw_data,syn_data,apply_hierarchy)
     attr_similarity_df = attr_simiarlity(val_similarity_df)
     record_similarity_df = record_similarity(val_similarity_df)
     table_similarity_df = table_similarity(record_similarity_df)
