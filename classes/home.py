@@ -65,7 +65,7 @@ class home:
                 st.caption(f"레코드 수: {len(st.session_state.raw_data)}\
                     \n속성 수: {len(st.session_state.raw_data.columns)}\
                     \n속성 조합 수 {st.session_state.raw_comb_num}")
-                st.dataframe(st.session_state.raw_data[:1000])
+                st.dataframe(st.session_state.raw_data[:100])
 
         # synthetic data uploader
         col2.markdown("### 재현데이터")
@@ -80,13 +80,12 @@ class home:
 
             if lev_selected:
                 try:
-                    if st.session_state.syn_data_lev == "고수준":
-                        with st.spinner("고수준 재현데이터 전처리중..."):
+                    with st.spinner("재현데이터 속성별 처리중..."):
+                        if st.session_state.syn_data_lev == "고수준":
                             st.session_state.syn_data = util.load_data_syn_high(syn_data_file)
-                    elif st.session_state.syn_data_lev == "저수준":
-                        with st.spinner("저수준 재현데이터 전처리중..."):
+                        elif st.session_state.syn_data_lev == "저수준":
                             st.session_state.syn_data = util.load_data_syn_low(syn_data_file)
-                    st.experimental_rerun()
+                        st.experimental_rerun()
                 except KeyError as er:
                     st.error(f"KeyError: {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n재현데이터인지 확인해주세요.")
 
@@ -101,13 +100,12 @@ class home:
                 if lev_selected:
                     st.session_state.syn_file_name = str(syn_data_file.name)
                     try:
-                        if st.session_state.syn_data_lev == "고수준":
-                            with st.spinner("고수준 재현데이터 전처리중..."):
-                                st.session_state.syn_data  = util.load_data_syn_high(syn_data_file)
-                        elif st.session_state.syn_data_lev == "저수준":
-                            with st.spinner("저수준 재현데이터 전처리중..."):
-                                st.session_state.syn_data  = util.load_data_syn_low(syn_data_file)
-                        st.experimental_rerun()
+                        with st.spinner("재현데이터 속성별 처리중..."):
+                            if st.session_state.syn_data_lev == "고수준":
+                                st.session_state.syn_data = util.load_data_syn_high(syn_data_file)
+                            elif st.session_state.syn_data_lev == "저수준":
+                                st.session_state.syn_data = util.load_data_syn_low(syn_data_file)
+                            st.experimental_rerun()
                     except KeyError as er:
                         st.error(f"KeyError: {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n재현데이터인지 확인해주세요.")
 
@@ -136,4 +134,4 @@ class home:
                 st.caption(f"레코드 수: {len(st.session_state.syn_data)}\
                     \n속성 수: {len(st.session_state.syn_data.columns)}\
                     \n속성 조합 수 {st.session_state.syn_comb_num}")
-                st.dataframe(st.session_state.syn_data[:1000])
+                st.dataframe(st.session_state.syn_data[:100])

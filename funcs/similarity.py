@@ -2,7 +2,7 @@ from time import time
 import pandas as pd
 import streamlit as st
 from stqdm import stqdm
-import timeit
+
 
 
 #전역변수 구분자
@@ -70,7 +70,6 @@ def hierarchy_groupby(raw_data, syn_data, similarity_df, category_cols):
     
 def val_similarity(raw_data, syn_data, apply_hierarchy=False):
     #========================특성 유사도========================
-    start = timeit.default_timer()
     raw_cols = list(raw_data.columns)
     similarity_df = pd.merge(raw_data,syn_data, left_index=True, right_index=True, how="inner")
 
