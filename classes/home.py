@@ -59,13 +59,14 @@ class home:
                 st.session_state.raw_data = st.session_state.raw_data.drop(drop_raw,axis=1)
                 st.experimental_rerun()
             with col1.expander("입력 데이터 확인"):
+                raw_preview = st.session_state.raw_data[:100]
                 st.session_state.raw_comb_num = len(get_all_combinations(st.session_state.raw_data))
                 st.markdown(f"### {st.session_state.raw_file_name}")
                 st.write(f"제거된 속성: {st.session_state.drop_raw_disp}")
                 st.caption(f"레코드 수: {len(st.session_state.raw_data)}\
                     \n속성 수: {len(st.session_state.raw_data.columns)}\
                     \n속성 조합 수 {st.session_state.raw_comb_num}")
-                st.dataframe(st.session_state.raw_data[:100])
+                st.dataframe(raw_preview)
 
         # synthetic data uploader
         col2.markdown("### 재현데이터")
@@ -128,10 +129,11 @@ class home:
                 st.experimental_rerun()
     
             with col2.expander("입력 데이터 확인"):
+                syn_preview = st.session_state.syn_data[:100]
                 st.session_state.syn_comb_num = len(get_all_combinations(st.session_state.syn_data))
                 st.markdown(f"### {st.session_state.syn_file_name}")
                 st.write(f"제거된 속성: {st.session_state.drop_syn_disp}")
                 st.caption(f"레코드 수: {len(st.session_state.syn_data)}\
                     \n속성 수: {len(st.session_state.syn_data.columns)}\
                     \n속성 조합 수 {st.session_state.syn_comb_num}")
-                st.dataframe(st.session_state.syn_data[:100])
+                st.dataframe(syn_preview)

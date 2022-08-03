@@ -14,7 +14,6 @@ class sim_page:
             hier_submit = hier_form.form_submit_button("유사도 계산 시작")
 
             if hier_submit:    
-                # with st.spinner("유사도 계산중..."):
                 st.session_state.val_similarity, st.session_state.attr_similarity, st.session_state.record_similarity, st.session_state.table_similarity\
                     = similarity(st.session_state.raw_data, st.session_state.syn_data, apply_hierarchy)
                 tab1, tab2, tab3, tab4 = st.tabs(["테이블 유사도", "특성 유사도", "속성 유사도", "레코드 유사도"])
