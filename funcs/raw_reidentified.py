@@ -1,8 +1,5 @@
 import pandas as pd
 import itertools
-import numpy as np
-from tqdm import tqdm
-import funcs.risk_raw as risk
 import streamlit as st
 from stqdm import stqdm
 
@@ -81,7 +78,6 @@ def raw_reidentified_datas(raw_data, one_attr, K=-1, start_dim=1, end_dim=-1):
     combs = get_all_combinations(data, start_dim, end_dim)
 
     reidentified_evidence = pd.DataFrame()
-    # loop = tqdm(list(combs), total=len(combs), leave=True)
     loop = stqdm(list(combs))
     for comb in loop:
         #특정 속성 조합에서 유일한 데이터 반환

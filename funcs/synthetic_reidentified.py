@@ -1,9 +1,6 @@
 import pandas as pd
 import itertools
-import numpy as np
-from tqdm import tqdm
 from stqdm import stqdm
-import funcs.risk_syn as risk
 import streamlit as st
 
 def is_unique(data):

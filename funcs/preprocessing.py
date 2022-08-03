@@ -1,10 +1,8 @@
 import pandas as pd
-from ast import literal_eval
 from joblib import Parallel, delayed
 import streamlit as st
 import json
 from stqdm import stqdm
-import timeit
 
 #====================================원본 전처리=============================
 """
@@ -64,7 +62,6 @@ def preprocess_json(x):
                     connected += val_list[i]['name']
                 return connected
         except: return x
-        # else: return x
     else: return x
 
 # ratio parsing 위해 json형태인지 확인

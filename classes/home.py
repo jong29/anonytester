@@ -1,6 +1,5 @@
 #modules
 import streamlit as st
-import pandas as pd
 import funcs.utility as util
 
 #functions
