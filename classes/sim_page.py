@@ -16,6 +16,8 @@ class sim_page:
             if hier_submit:    
                 st.session_state.val_similarity, st.session_state.attr_similarity, st.session_state.record_similarity, st.session_state.table_similarity\
                     = similarity(st.session_state.raw_data, st.session_state.syn_data, apply_hierarchy)
+                
+            if "val_similarity" in st.session_state:
                 tab1, tab2, tab3, tab4 = st.tabs(["테이블 유사도", "특성 유사도", "속성 유사도", "레코드 유사도"])
                 with tab1:
                     self.table_sim()

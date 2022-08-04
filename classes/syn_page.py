@@ -12,6 +12,7 @@ from funcs.risk_syn import compute_risk
 from funcs.utility import convert_df2csv
 from funcs.synthetic_reidentified import syn_reidentified_datas
 
+import timeit
 class syn_page:
     def __init__(self):
         if ("syn_data" in st.session_state) and ("raw_data" in st.session_state):
@@ -39,24 +40,25 @@ class syn_page:
 
     def syn_reid(self):
         self.reid_info()
-        st.header("재현데이터 재식별도")
+        st.subheader("재현데이터 재식별도 계산")
         start_cont = st.form("reid_calc")
         col0, col1, col2, col3, col4 = start_cont.columns([0.3, 5, 1, 20, 1])
         dims = col3.slider('재식별도 계산 Dimension을 선택',
                             1, len(st.session_state.raw_data.columns),(1, len(st.session_state.raw_data.columns)))
         record_num = col1.number_input("재식별 확인 레코드 수", min_value=-1, step=1, help="-1을 입력하시면 전체를 확인합니다.")
 
-        # if "syn_reid_done" not in st.session_state:
-        #     st.session_state.syn_reid_done = False
-
         start_button = col1.form_submit_button("재식별도 계산 시작")
+        st.write(start_button)
         reidentified_res = st.container()
 
         if start_button:
+            start = timeit.default_timer()
             st.session_state.syn_reidentified, st.session_state.dropped_cols = syn_reidentified_datas(\
                 st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr,\
                 K=record_num,start_dim=dims[0],end_dim=dims[1])
-            # st.session_state.syn_reid_done = True
+            stop = timeit.default_timer()
+            reidentified_res.write(f"계산 시간: {stop-start}")
+            
             # ------- 재식별도 계산 완료 -------
 
             # 재식별 데이터 저장 디렉토리 강제 생성
@@ -110,11 +112,11 @@ class syn_page:
             # 재식별 데이터 csv파일 자동 생성
             reid_file_path = synfile_dir_path + '/' + st.session_state.syn_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv'
             if st.session_state.syn_reidentified.empty:
-                st.success(f"재식별된 레코드가 없습니다!")
+                st.info(f"재식별된 레코드가 없습니다!")
             elif not os.path.exists(reid_file_path):
                 with open(reid_file_path, 'w', encoding='utf-8-sig', newline='') as f:
                     st.session_state.syn_reidentified.to_csv(f)
-                    st.success(f"재식별도 파일 다운로드 완료!  \n   {reid_file_path}")
+                    st.info(f"재식별도 파일 다운로드 완료!  \n   {reid_file_path}")
         
         if "syn_reidentified" in st.session_state:
             reid_record_num = len(st.session_state.syn_reidentified)
@@ -232,9 +234,11 @@ class syn_page:
             with open(json_file_path, 'r', encoding = 'utf-8') as f:
                 meta_dict = json.load(f)
             if meta_dict["dims_remaining"][0] == -1:
-                st.markdown('<h2 style="color: IndianRed; font-weight:bold;"> 전체 디멘션 계산 완료했습니다</h2>', unsafe_allow_html=True)
+                # st.markdown('<h2 style="color: SeaGreen; font-weight:bold;"> 전체 디멘션 계산 완료했습니다</h2>', unsafe_allow_html=True)
+                st.success("젠체 디멘션 계산 완료했습니다!")
             else:
-                st.markdown(f'<h2 style="color: IndianRed; font-weight:bold;"> 계산 되지 않은 디멘션: {meta_dict["dims_remaining"][0]} 에서 {meta_dict["dims_remaining"][1]}</h2>', unsafe_allow_html=True)
+                # st.markdown(f'<h2 style="color: #0b305d; font-weight:bold;"> 계산 되지 않은 디멘션: {meta_dict["dims_remaining"][0]} 에서 {meta_dict["dims_remaining"][1]}</h2>', unsafe_allow_html=True)
+                st.warning(f'계산 되지 않은 디멘션: {meta_dict["dims_remaining"][0]} 에서 {meta_dict["dims_remaining"][1]}')
 
             st.markdown(f"""
                 <div>

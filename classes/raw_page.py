@@ -9,11 +9,11 @@ from funcs.risk_raw import compute_risk
 from funcs.utility import convert_df2csv
 from funcs.raw_reidentified import raw_reidentified_datas
 
+import timeit
 
 class raw_page:
     def __init__(self):
         if "raw_data" in st.session_state:
-            # if("raw_single_attr" not in st.session_state):
             with st.spinner("데이터 로딩중..."):
                 st.session_state.raw_single_attr, st.session_state.raw_one_attr, st.session_state.raw_record, st.session_state.raw_table \
                     = compute_risk(st.session_state.raw_data.copy())
@@ -46,7 +46,10 @@ class raw_page:
         if start_button or st.session_state.raw_reid_done:
             reidentified_res = st.container()
             reidentified_res.write(f"총 {st.session_state.raw_comb_num}개의 속성 조합을 검사합니다.")
+            start = timeit.default_timer()
             raw_reidentified, dropped_cols = raw_reidentified_datas(st.session_state.raw_data, st.session_state.raw_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
+            stop = timeit.default_timer()
+            reidentified_res.write(f"계산 시간: {stop - start}")
             reid_rate = len(raw_reidentified)/len(st.session_state.raw_data)
             reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
             reidentified_res.subheader(f"재식별된 레코드 수: {len(raw_reidentified)}")
