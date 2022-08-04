@@ -33,43 +33,45 @@ class raw_page:
         else:
             st.markdown("##  \n##  \n## 업로드된 원본데이터가 없습니다")
 
+    #원본 재식별도 탭
     def raw_reid(self):
+        #기본 레이아웃
         st.subheader("원본데이터 재식별도")
         start_cont = st.form("reid_calc")
         col0, col1, col2, col3, col4 = start_cont.columns([0.3, 5, 1, 20, 1])
         dims = col3.slider('재식별도 계산 Dimension을 선택',
                             1, len(st.session_state.raw_data.columns),(1, len(st.session_state.raw_data.columns)))
         record_num = col1.number_input("재식별 확인 레코드 수", min_value=-1, step=1, help="-1을 입력하시면 전체를 확인합니다.")
-        if "raw_reid_done" not in st.session_state:
-            st.session_state.raw_reid_done = False
         start_button = col1.form_submit_button("재식별도 계산 시작")
-        if start_button or st.session_state.raw_reid_done:
-            reidentified_res = st.container()
-            reidentified_res.write(f"총 {st.session_state.raw_comb_num}개의 속성 조합을 검사합니다.")
+
+        #재식별도 계산 진행
+        if start_button:
             start = timeit.default_timer()
-            raw_reidentified, dropped_cols = raw_reidentified_datas(st.session_state.raw_data, st.session_state.raw_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
+            st.session_state.raw_reidentified, st.session_state.dropped_cols_raw = raw_reidentified_datas(st.session_state.raw_data, st.session_state.raw_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
             stop = timeit.default_timer()
-            reidentified_res.write(f"계산 시간: {stop - start}")
-            reid_rate = len(raw_reidentified)/len(st.session_state.raw_data)
+            st.write(f"계산 시간: {stop - start}")
+            
+            if st.session_state.dropped_cols_raw: #empty list is false
+                drop_str = "모두 같은 값을 가져 drop된 속성: "
+                for i in range(len(st.session_state.dropped_cols_raw)):
+                    if i != 0:
+                        drop_str += ", "
+                    drop_str += str(st.session_state.dropped_cols_raw[i])
+                st.markdown("##### " + drop_str)
+        
+        #재식별도 관련 정보 표시
+        if "raw_reidentified" in st.session_state:
+            reidentified_res = st.container()
+            reid_rate = len(st.session_state.raw_reidentified)/len(st.session_state.raw_data)
             reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
-            reidentified_res.subheader(f"재식별된 레코드 수: {len(raw_reidentified)}")
+            reidentified_res.subheader(f"재식별된 레코드 수: {len(st.session_state.raw_reidentified)}")
             reidentified_res.download_button(
                     label="재식별된 데이터 csv로 저장",
-                    data = convert_df2csv(raw_reidentified),
+                    data = convert_df2csv(st.session_state.raw_reidentified),
                     file_name=st.session_state.raw_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv',
                     mime='text/csv',
                 )
-            reidentified_res.write(raw_reidentified[:1000])
-            
-            if dropped_cols: #empty list is false
-                drop_str = "모두 같은 값을 가져 drop된 속성: "
-                for i in range(len(dropped_cols)):
-                    if i != 0:
-                        drop_str += ", "
-                    drop_str += str(dropped_cols[i])
-                st.markdown("##### " + drop_str)
-
-            st.session_state.raw_reid_done = True
+            reidentified_res.write(st.session_state.raw_reidentified[:1000])
 
     def raw_table(self):
         #테이블 재식별 위험도

@@ -36,8 +36,8 @@ def syn_reidentified_datas(raw_data, syn_data, syn_one_attr, K=-1, start_dim=1, 
     if(K==-1):
         K=len(syn_data)
     
-    raw_data,raw_dropped_cols  = is_unique(raw_data)
-    syn_data = syn_data.drop(raw_dropped_cols, axis=1)
+    raw_data,dropped_cols  = is_unique(raw_data)
+    syn_data = syn_data.drop(dropped_cols, axis=1)
 
     # Distinct한 속성값이 많은 속성 순으로 정렬
     Priority = raw_data.nunique().sort_values(ascending=False).index
@@ -60,5 +60,5 @@ def syn_reidentified_datas(raw_data, syn_data, syn_one_attr, K=-1, start_dim=1, 
                     break
     if not syn_reident.empty:
         syn_reident = syn_reident.sort_values('abst_row_num__').reset_index(drop=True)
-    return syn_reident, raw_dropped_cols
+    return syn_reident, dropped_cols
 

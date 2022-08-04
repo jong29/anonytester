@@ -48,12 +48,11 @@ class syn_page:
         record_num = col1.number_input("재식별 확인 레코드 수", min_value=-1, step=1, help="-1을 입력하시면 전체를 확인합니다.")
 
         start_button = col1.form_submit_button("재식별도 계산 시작")
-        st.write(start_button)
         reidentified_res = st.container()
 
         if start_button:
             start = timeit.default_timer()
-            st.session_state.syn_reidentified, st.session_state.dropped_cols = syn_reidentified_datas(\
+            st.session_state.syn_reidentified, st.session_state.dropped_cols_syn = syn_reidentified_datas(\
                 st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr,\
                 K=record_num,start_dim=dims[0],end_dim=dims[1])
             stop = timeit.default_timer()
@@ -82,8 +81,7 @@ class syn_page:
             json_file_path = synfile_dir_path + '/metadata.json'
             
             # json 메타데이터 업데이트 재식별도 계산 시
-            if os.path.exists(json_file_path):
-                # 메타데이터 파일 업데이트
+            if os.path.exists(json_file_path): # 메타데이터 파일 업데이트
                 with open(json_file_path, 'r', encoding = 'utf-8') as f:
                     meta_dict = json.load(f)
                 if dims[1] == len(st.session_state.raw_data.columns): # 모든 디멘션 검사 후 또 검사하면 index out of range error
@@ -95,8 +93,7 @@ class syn_page:
                 meta_dict["files_to_combine"].append(str(dims[0]) + '_' + str(dims[1]))
                 with open(json_file_path,'w',encoding = 'utf-8') as f:
                     f.write(json.dumps(meta_dict, indent=4))
-            else:
-                # 메타데이터 파일 생성
+            else: # 메타데이터 파일 생성
                 if dims[1] == len(st.session_state.raw_data.columns):
                     meta_dict["dims_remaining"] = [-1]  # 디멘션 전부 확인했을때 -1로 표시
                 else:
@@ -118,10 +115,10 @@ class syn_page:
                     st.session_state.syn_reidentified.to_csv(f)
                     st.info(f"재식별도 파일 다운로드 완료!  \n   {reid_file_path}")
         
+        # 재식별도 관련 정보 표시
         if "syn_reidentified" in st.session_state:
             reid_record_num = len(st.session_state.syn_reidentified)
             reid_rate = reid_record_num/len(st.session_state.syn_data)
-            # 재식별도 관련 정보 표시
             reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
             reidentified_res.subheader(f"재식별된 레코드 수: {len(st.session_state.syn_reidentified)}")
 
@@ -130,12 +127,12 @@ class syn_page:
                     st.dataframe(st.session_state.syn_reidentified[:1000])
             
             # column 전체가 같은 값을 가져서 drop되면 표시
-            if st.session_state.dropped_cols:
+            if st.session_state.dropped_cols_syn:
                 drop_str = "모두 같은 값을 가져 drop된 속성: "
-                for i in range(len(st.session_state.dropped_cols)):
+                for i in range(len(st.session_state.dropped_cols_syn)):
                     if i != 0:
                         drop_str += ", "
-                    drop_str += str(st.session_state.dropped_cols[i])
+                    drop_str += str(st.session_state.dropped_cols_syn[i])
                 st.markdown("##### " + drop_str)
             st.session_state.syn_reid_done = True
             
