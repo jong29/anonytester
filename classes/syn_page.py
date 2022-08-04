@@ -84,10 +84,11 @@ class syn_page:
             if os.path.exists(json_file_path): # 메타데이터 파일 업데이트
                 with open(json_file_path, 'r', encoding = 'utf-8') as f:
                     meta_dict = json.load(f)
-                if dims[1] == len(st.session_state.raw_data.columns): # 모든 디멘션 검사 후 또 검사하면 index out of range error
-                    meta_dict["dims_remaining"] = [-1]  # 디멘션 전부 확인했을때 -1로 표시
+                if dims[1] == len(st.session_state.raw_data.columns):
+                    meta_dict["dims_remaining"][0] = -1  # 디멘션 전부 확인했을때 -1로 표시
                 else:
-                    meta_dict["dims_remaining"][0] = dims[1]+1
+                    if meta_dict["dims_remaining"][0] != -1:
+                        meta_dict["dims_remaining"][0] = dims[1]+1
                 if reid_record_num > meta_dict["reid_record"]: meta_dict["reid_record"] = (reid_record_num)
                 if reid_rate > meta_dict["reid_rate"]: meta_dict["reid_rate"] = (reid_rate)
                 meta_dict["files_to_combine"].append(str(dims[0]) + '_' + str(dims[1]))
@@ -95,7 +96,7 @@ class syn_page:
                     f.write(json.dumps(meta_dict, indent=4))
             else: # 메타데이터 파일 생성
                 if dims[1] == len(st.session_state.raw_data.columns):
-                    meta_dict["dims_remaining"] = [-1]  # 디멘션 전부 확인했을때 -1로 표시
+                    meta_dict["dims_remaining"] = [-1, -1]  # 디멘션 전부 확인했을때 -1로 표시
                 else:
                     meta_dict["dims_remaining"] = [dims[1]+1, len(st.session_state.raw_data.columns)]
                 meta_dict["reid_record"] = reid_record_num
