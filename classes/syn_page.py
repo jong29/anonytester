@@ -21,6 +21,13 @@ class syn_page:
                 with st.spinner("데이터 로딩중..."):
                     st.session_state.syn_single_attr, st.session_state.syn_one_attr, st.session_state.syn_record, st.session_state.syn_table \
                         = compute_risk(st.session_state.syn_data.copy())
+            try:
+                if (st.session_state.raw_data.columns == st.session_state.syn_data.columns).all():
+                    pass
+                else:
+                    st.warning("원본데이터와 재현데이터의 속성이 다릅니다.")
+            except:
+                st.warning("원본데이터와 재현데이터의 속성이 다릅니다.")
 
             tab1, tab2, tab3, tab4, tab5 = st.tabs(["재현 재식별도", "테이블 재식별 위험도", "속성 재식별 위험도", "속성값 재식별 위험도", "레코드 재식별 위험도"])
 
@@ -232,10 +239,8 @@ class syn_page:
             with open(json_file_path, 'r', encoding = 'utf-8') as f:
                 meta_dict = json.load(f)
             if meta_dict["dims_remaining"][0] == -1:
-                # st.markdown('<h2 style="color: SeaGreen; font-weight:bold;"> 전체 디멘션 계산 완료했습니다</h2>', unsafe_allow_html=True)
                 st.success("젠체 디멘션 계산 완료했습니다!")
             else:
-                # st.markdown(f'<h2 style="color: #0b305d; font-weight:bold;"> 계산 되지 않은 디멘션: {meta_dict["dims_remaining"][0]} 에서 {meta_dict["dims_remaining"][1]}</h2>', unsafe_allow_html=True)
                 st.warning(f'계산 되지 않은 디멘션: {meta_dict["dims_remaining"][0]} 에서 {meta_dict["dims_remaining"][1]}')
 
             st.markdown(f"""
