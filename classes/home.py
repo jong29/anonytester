@@ -7,7 +7,6 @@ from funcs.raw_reidentified import get_all_combinations
 
 class home:
     def __init__(self):
-        # st.write("# 재현데이터 평가도구 ANONY TESTER")
         st.markdown(
             """
             Anony Tester는 재현데이터의 안정성 및 유용성 지표를 평가합니다.
@@ -74,40 +73,24 @@ class home:
         # first synthetic data upload
         if (syn_data_file is not None) and ("syn_data" not in st.session_state):
             st.session_state.syn_file_name = str(syn_data_file.name)
-            lev_select = col2.form("syn_lev")
-            st.session_state.syn_data_lev = lev_select.radio("재현데이터 수준선택", ("고수준", "저수준"), horizontal=True)
-            lev_selected = lev_select.form_submit_button("다음")
-
-            if lev_selected:
-                try:
-                    with st.spinner("재현데이터 속성별 처리중..."):
-                        if st.session_state.syn_data_lev == "고수준":
-                            st.session_state.syn_data = util.load_data_syn_high(syn_data_file)
-                        elif st.session_state.syn_data_lev == "저수준":
-                            st.session_state.syn_data = util.load_data_syn_low(syn_data_file)
-                        st.experimental_rerun()
-                except KeyError as er:
-                    st.error(f"KeyError: {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n재현데이터인지 확인해주세요.")
+            try:
+                with st.spinner("재현데이터 속성별 처리중..."):
+                    st.session_state.syn_data = util.load_data_syn(syn_data_file)
+                    st.experimental_rerun()
+            except KeyError as er:
+                st.error(f"KeyError: {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n재현데이터인지 확인해주세요.")
 
         # consecutive uploads
         if syn_data_file is not None:
             if syn_data_file.name != st.session_state.syn_file_name:
                 st.session_state.drop_syn_disp = list()
-                lev_select = col2.form("syn_lev")
-                st.session_state.syn_data_lev = lev_select.radio("재현데이터 수준선택", ("고수준", "저수준"), horizontal=True)
-                lev_selected = lev_select.form_submit_button("다음")
-
-                if lev_selected:
-                    st.session_state.syn_file_name = str(syn_data_file.name)
-                    try:
-                        with st.spinner("재현데이터 속성별 처리중..."):
-                            if st.session_state.syn_data_lev == "고수준":
-                                st.session_state.syn_data = util.load_data_syn_high(syn_data_file)
-                            elif st.session_state.syn_data_lev == "저수준":
-                                st.session_state.syn_data = util.load_data_syn_low(syn_data_file)
-                            st.experimental_rerun()
-                    except KeyError as er:
-                        st.error(f"KeyError: {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n재현데이터인지 확인해주세요.")
+                st.session_state.syn_file_name = str(syn_data_file.name)
+                try:
+                    with st.spinner("재현데이터 속성별 처리중..."):
+                        st.session_state.syn_data = util.load_data_syn(syn_data_file)
+                        st.experimental_rerun()
+                except KeyError as er:
+                    st.error(f"KeyError: {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n재현데이터인지 확인해주세요.")
 
         if "syn_data" in st.session_state:
             if "drop_syn_disp" not in st.session_state:

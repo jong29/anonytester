@@ -19,33 +19,32 @@ def preprocessing_raw(raw_data):
     raw_data.columns = raw_data.columns.str.lower()
     return raw_data
 
-#====================================고수준 전처리=============================
+#====================================재현 전처리=============================
 @st.cache(show_spinner=False, suppress_st_warning=True)
-def preprocessing_high(high_data):
-    high_data = remove_unneccessary_columns(high_data)
-    high_data = preprocess_highlevel_df(high_data)
-    high_data = high_data.set_index('abst_row_num__')
-    high_data.columns = high_data.columns.str.lower()
-    return high_data
+def preprocessing_syn(syn_data):
+    syn_data = remove_unneccessary_columns(syn_data)
+    syn_data = preprocess_syn_df(syn_data)
+    syn_data = syn_data.set_index('abst_row_num__')
+    syn_data.columns = syn_data.columns.str.lower()
+    return syn_data
 
-@st.cache(show_spinner=False, suppress_st_warning=True)
-def preprocess_highlevel_df(syn_data):
+def preprocess_syn_df(syn_data):
     syn_cols = list(syn_data.columns)
     preprocessed_syn_data=pd.DataFrame()
-    ##### 고수준 json 처리
     loop = stqdm(list(syn_cols))
     for c in loop:
         preprocessed_syn_data[c] = syn_data[c].apply(preprocess_json)
     return preprocessed_syn_data
 
-#====================================저수준 전처리=============================
-def preprocessing_low(low_data):
-    low_data = remove_unneccessary_columns(low_data)
-    low_data = preprocess_lowlevel_df(low_data)
-    low_data = low_data.set_index('abst_row_num__')
-    low_data.columns = low_data.columns.str.lower()
-    return low_data
-    
+#====================================json 전처리=============================
+# ratio parsing 위해 json형태인지 확인
+def validateJSON(jsonData):
+    try:
+        json.loads(jsonData)
+    except:
+        return False
+    return True
+
 # ratio 값이 2개 이상이면 연결형, 아니면 최빈값 형태로 반환
 def preprocess_json(x):
     if(str(x)[0]=="["):
@@ -64,21 +63,8 @@ def preprocess_json(x):
         except: return x
     else: return x
 
-# ratio parsing 위해 json형태인지 확인
-def validateJSON(jsonData):
-    try:
-        json.loads(jsonData)
-    except:
-        return False
-    return True
 
-def preprocess_lowlevel_df(syn_data):
-    syn_cols = list(syn_data.columns)
-    preprocessed_syn_data=pd.DataFrame()
-    loop = stqdm(list(syn_cols))
-    for c in loop:
-        preprocessed_syn_data[c] = syn_data[c].apply(preprocess_json)
-    return preprocessed_syn_data
+#====================================기타 함수=============================
 
 def remove_unneccessary_columns(syn_data):
     for c in syn_data.columns:
@@ -110,5 +96,4 @@ def preprocess_lowlevel_df_parallel(syn_data):
 # 저수준 데이터 전처리 병렬 버전 (function address)
 def preprocess_lowlevel_df_parallel_func_address(syn_data, col):
     return syn_data[col].apply(preprocess_json)
-#====================================저수준 전처리=============================
 

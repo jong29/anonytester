@@ -36,20 +36,12 @@ def load_data_raw(file):
     df = pre.preprocessing_raw(df)
     return df
 
-def load_data_syn_high(file):
+def load_data_syn(file):
     try:
         df = pd.read_csv(file, encoding='utf-8')
     except ValueError:
         df = pd.read_csv(file, encoding='cp949')
-    df = pre.preprocessing_high(df)
-    return df
-
-def load_data_syn_low(file):
-    try:
-        df = pd.read_csv(file, encoding='utf-8')
-    except ValueError:
-        df = pd.read_csv(file, encoding='cp949')
-    df = pre.preprocessing_low(df)
+    df = pre.preprocessing_syn(df)
     return df
 
 def to_str(drop_list):

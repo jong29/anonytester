@@ -44,7 +44,7 @@ class syn_page:
         else:
             st.markdown("##  \n##  \n## 원본데이터 또는 재현데이터가 업로드 되지 않았습니다")
             
-
+    #재현데이터 재식별도 탭
     def syn_reid(self):
         self.reid_info()
         st.subheader("재현데이터 재식별도 계산")
@@ -144,7 +144,7 @@ class syn_page:
                 st.markdown("##### " + drop_str)
             st.session_state.syn_reid_done = True
             
-
+    #테이블 재식별 위험도 탭
     def syn_table(self):
         st.subheader('테이블 재식별 위험도')
         st.download_button(
@@ -155,12 +155,12 @@ class syn_page:
         )
         col1, col2 = st.columns(2)
         col1.dataframe(st.session_state.syn_table.round(decimals = 4))
+        #그래프 생성
         fig, ax = plt.subplots(figsize=(4,4))
         means = st.session_state.syn_table.iloc[0].iat[0]
         mins = st.session_state.syn_table.iloc[0].iat[3]
         maxes = st.session_state.syn_table.iloc[0].iat[2]
         std = st.session_state.syn_table.iloc[0].iat[1]
-
         ax.errorbar('Table Reidentification Risk', means, yerr=std, fmt='8r', markersize=10, ecolor='tab:blue', lw=10)
         ax.errorbar('Table Reidentification Risk', means, yerr=[[means-mins],[maxes-means]],
                     fmt='_r', ecolor='tab:orange', lw=3, capsize=3)
@@ -170,7 +170,7 @@ class syn_page:
         if show_table_risk:
             col2.image(buf)
         
-
+    #속성 재식별 위험도 탭
     def syn_attr(self):
         st.subheader('속성 재식별 위험도')
         st.download_button(
@@ -180,6 +180,7 @@ class syn_page:
             mime='text/csv',
         )
         st.dataframe(st.session_state.syn_one_attr.round(decimals = 4))
+        #그래프 생성
         fig, ax = plt.subplots(figsize=(12,4))
         means = st.session_state.syn_one_attr['mean']
         mins = st.session_state.syn_one_attr['min']
@@ -195,7 +196,7 @@ class syn_page:
         if show_attr_risk:
             st.image(buf)
 
-
+    # 속성값 재식별 위험도 탭
     def syn_attr_val(self):
         st.subheader('속성값 재식별 위험도')
         st.download_button(
@@ -207,7 +208,7 @@ class syn_page:
         st.session_state.syn_single_attr = st.session_state.syn_single_attr.round(4).head(200)
         st.dataframe(st.session_state.syn_single_attr.astype(str))
 
-        
+    # 레코드 재식별 위험도 탭
     def syn_record(self):
         st.subheader('레코드 재식별 위험도')
         st.download_button(
@@ -231,7 +232,7 @@ class syn_page:
         except FileExistsError:
             pass
 
-
+    # 재식별도 계산된 기록(메타데이터) 표시
     def reid_info(self):
         st.subheader('재식별 데이터 검사 기록')
         json_file_path = str(Path.home()) + "/Desktop/Anonytest/" + st.session_state.syn_file_name[:-4] + '/metadata.json'
