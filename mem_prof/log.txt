@@ -1,0 +1,234 @@
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    64    117.7 MiB    117.7 MiB           1   @profile
+    65                                         def preprocessing_raw(raw_data):
+    66    139.7 MiB     21.9 MiB           1       raw_data = raw_data.reset_index().rename(columns={'index':'abst_row_num__'})
+    67    139.7 MiB      0.0 MiB           1       raw_data['abst_row_num__'] = raw_data['abst_row_num__'] + 1
+    68    139.7 MiB      0.0 MiB           1       raw_data = raw_data.set_index("abst_row_num__")
+    69    139.8 MiB      0.0 MiB           1       raw_data.columns = raw_data.columns.str.lower()
+    70    139.8 MiB      0.0 MiB           1       return raw_data
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    19    119.8 MiB    119.8 MiB           1   @profile
+    20                                         def is_unique(data):
+    21    119.8 MiB      0.0 MiB           1       dropped_cols = []
+    22    120.1 MiB      0.0 MiB          10       for attr in list(data.columns):
+    23    120.1 MiB      0.0 MiB           9           a = data[attr].to_numpy()
+    24    120.1 MiB      0.2 MiB           9           if (a[0] == a).all():
+    25                                                     data = data.drop(attr,axis=1)
+    26                                                     dropped_cols.append(attr)
+    27    120.1 MiB      0.0 MiB           1       return data, dropped_cols
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+     6    142.5 MiB    142.5 MiB           1   @profile
+     7                                         def get_all_combinations(data, start_dim=1,end_dim=-1):
+     8    142.5 MiB      0.0 MiB           1       all_combinations = list()
+     9    142.5 MiB      0.0 MiB           1       if(start_dim == -1):
+    10                                                 start_dim = len(data.columns)
+    11    142.5 MiB      0.0 MiB           1       if(end_dim == -1):
+    12    142.5 MiB      0.0 MiB           1           end_dim = len(data.columns)
+    13    142.5 MiB      0.0 MiB          10       for r in range(start_dim, end_dim+1):
+    14    142.5 MiB      0.0 MiB           9           combinations_object = itertools.combinations(list(data.columns), r)
+    15    142.5 MiB      0.0 MiB           9           combinations_list = list(combinations_object)
+    16    142.5 MiB      0.0 MiB           9           all_combinations += combinations_list
+    17    142.5 MiB      0.0 MiB           1       return list(all_combinations)
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29    142.5 MiB    142.5 MiB           1   @profile
+    30                                         def find_unique_data(data, comb):
+    31                                             #특정 속성조합 comb에서 유일한 데이터 반환
+    32    143.9 MiB      1.4 MiB           1       unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
+    33    143.9 MiB      0.0 MiB           1       return unique
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29    148.4 MiB    148.4 MiB           1   @profile
+    30                                         def find_unique_data(data, comb):
+    31                                             #특정 속성조합 comb에서 유일한 데이터 반환
+    32    148.4 MiB      0.0 MiB           1       unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
+    33    148.4 MiB      0.0 MiB           1       return unique
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29    146.0 MiB    146.0 MiB           1   @profile
+    30                                         def find_unique_data(data, comb):
+    31                                             #특정 속성조합 comb에서 유일한 데이터 반환
+    32    146.5 MiB      0.5 MiB           1       unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
+    33    146.5 MiB      0.0 MiB           1       return unique
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29    147.0 MiB    147.0 MiB           1   @profile
+    30                                         def find_unique_data(data, comb):
+    31                                             #특정 속성조합 comb에서 유일한 데이터 반환
+    32    147.5 MiB      0.5 MiB           1       unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
+    33    147.5 MiB      0.0 MiB           1       return unique
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29    147.5 MiB    147.5 MiB           1   @profile
+    30                                         def find_unique_data(data, comb):
+    31                                             #특정 속성조합 comb에서 유일한 데이터 반환
+    32    147.5 MiB      0.0 MiB           1       unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
+    33    147.5 MiB      0.0 MiB           1       return unique
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29    147.5 MiB    147.5 MiB           1   @profile
+    30                                         def find_unique_data(data, comb):
+    31                                             #특정 속성조합 comb에서 유일한 데이터 반환
+    32    147.5 MiB      0.0 MiB           1       unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
+    33    147.5 MiB      0.0 MiB           1       return unique
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29    147.5 MiB    147.5 MiB           1   @profile
+    30                                         def find_unique_data(data, comb):
+    31                                             #특정 속성조합 comb에서 유일한 데이터 반환
+    32    147.5 MiB      0.0 MiB           1       unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
+    33    147.5 MiB      0.0 MiB           1       return unique
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29    147.5 MiB    147.5 MiB           1   @profile
+    30                                         def find_unique_data(data, comb):
+    31                                             #특정 속성조합 comb에서 유일한 데이터 반환
+    32    147.5 MiB      0.0 MiB           1       unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
+    33    147.5 MiB      0.0 MiB           1       return unique
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29    147.5 MiB    147.5 MiB           1   @profile
+    30                                         def find_unique_data(data, comb):
+    31                                             #특정 속성조합 comb에서 유일한 데이터 반환
+    32    147.5 MiB      0.0 MiB           1       unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
+    33    147.5 MiB      0.0 MiB           1       return unique
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29    147.5 MiB    147.5 MiB           1   @profile
+    30                                         def find_unique_data(data, comb):
+    31                                             #특정 속성조합 comb에서 유일한 데이터 반환
+    32    154.2 MiB      6.7 MiB           1       unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
+    33    154.2 MiB      0.0 MiB           1       return unique
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29    159.4 MiB    159.4 MiB           1   @profile
+    30                                         def find_unique_data(data, comb):
+    31                                             #특정 속성조합 comb에서 유일한 데이터 반환
+    32    163.9 MiB      4.6 MiB           1       unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
+    33    163.9 MiB      0.0 MiB           1       return unique
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29    156.4 MiB    156.4 MiB           1   @profile
+    30                                         def find_unique_data(data, comb):
+    31                                             #특정 속성조합 comb에서 유일한 데이터 반환
+    32    161.5 MiB      5.0 MiB           1       unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
+    33    161.5 MiB      0.0 MiB           1       return unique
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29    159.4 MiB    159.4 MiB           1   @profile
+    30                                         def find_unique_data(data, comb):
+    31                                             #특정 속성조합 comb에서 유일한 데이터 반환
+    32    163.4 MiB      4.1 MiB           1       unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
+    33    163.4 MiB      0.0 MiB           1       return unique
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29    160.7 MiB    160.7 MiB           1   @profile
+    30                                         def find_unique_data(data, comb):
+    31                                             #특정 속성조합 comb에서 유일한 데이터 반환
+    32    166.2 MiB      5.5 MiB           1       unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
+    33    166.2 MiB      0.0 MiB           1       return unique
+
+
+Filename: reid_mem.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    35    119.8 MiB    119.8 MiB           1   @profile
+    36                                         def raw_reidentified_datas(raw_data, K=-1, start_dim=1, end_dim=-1):
+    37                                             #=============원본 재식별도=============
+    38                                             #K가 -1이면 전부 검사 (데이터 길이만큼)
+    39    119.8 MiB      0.0 MiB           1       if(K==-1):
+    40    119.8 MiB      0.0 MiB           1           K=len(raw_data)
+    41                                             
+    42                                             #모두 같은 값을 가지는 속성 제거
+    43    120.1 MiB      0.3 MiB           1       data,dropped_cols  = is_unique(raw_data)
+    44                                         
+    45                                             # Distinct한 속성값이 많은 속성 순으로 정렬
+    46    120.6 MiB      0.5 MiB           1       Priority = raw_data.nunique().sort_values(ascending=False).index
+    47    142.5 MiB     21.9 MiB           1       data =  data.reindex(columns = Priority)
+    48                                             #속성 조합 반환
+    49    142.5 MiB      0.0 MiB           1       combs = get_all_combinations(data, start_dim, end_dim)
+    50                                         
+    51    142.5 MiB      0.0 MiB           1       reidentified_evidence = pd.DataFrame()
+    52    160.6 MiB    -11.7 MiB          14       for comb in combs:
+    53                                                 #특정 속성 조합에서 유일한 데이터 반환
+    54    161.7 MiB     -8.5 MiB          14           raw_unique = find_unique_data(data, comb)
+    55    161.7 MiB      0.0 MiB          14           if(len(raw_unique)!=0):
+    56    181.5 MiB     63.1 MiB           8               reidentified_evidence = pd.concat([reidentified_evidence,raw_unique],axis=0)
+    57    166.0 MiB    -43.6 MiB           8               reidentified_evidence = reidentified_evidence.drop_duplicates(subset ="abst_row_num__",keep="first")
+    58    166.0 MiB     -6.7 MiB          14           if(len(reidentified_evidence) >= K):
+    59    166.0 MiB      0.0 MiB           1               break
+    60    166.0 MiB      0.0 MiB           1       if not reidentified_evidence.empty:
+    61    164.3 MiB     -1.8 MiB           1           reidentified_evidence = reidentified_evidence.sort_values("abst_row_num__").reset_index(drop=True)
+    62    164.3 MiB      0.0 MiB           1       return reidentified_evidence, dropped_cols
+
+
