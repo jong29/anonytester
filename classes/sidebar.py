@@ -5,13 +5,14 @@ from classes.syn_page import syn_page
 from classes.home import home
 from classes.comb_reid import comb_reid
 from classes.sim_page import sim_page
+from classes.horiz_part import horiz_part
 
 class SideBar:
     def __init__(self):
         with st.sidebar:
             selected = option_menu(
                     menu_title = "페이지 설정",
-                    options=["Home", "원본데이터", "재현데이터", "유사도", "재식별도 결합"],
+                    options=["Home", "원본데이터", "재현데이터", "유사도", "재식별도 결합", "재식별도 수평분할"],
                     orientation="vertical"
                 )
             st.sidebar.title("About")
@@ -34,4 +35,6 @@ class SideBar:
             sim_page()
         if selected == '재식별도 결합':
             comb_reid()
+        if selected == '재식별도 수평분할':
+            horiz_part()
     
