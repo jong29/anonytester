@@ -1,5 +1,6 @@
 #modules
 import os
+from turtle import clear
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,10 +12,26 @@ import json
 from funcs.risk_syn import compute_risk
 from funcs.utility import convert_df2csv
 from funcs.synthetic_reidentified import syn_reidentified_datas
-
+    
 import timeit
 class horiz_part:
     def __init__(self):
+        # 분할처리할 데이터 업로드
+        col1, col2 = st.columns(2)
+        col1.markdown("### 원본데이터")
+        raw_data_file = col1.file_uploader("원본데이터 업로드", type="csv")
+
+        col2.markdown("### 재현데이터")
+        syn_data_file = col2.file_uploader("재현데이터 업로드", type="csv")
+
+        div_record_num = 0
+        with st.form("number of iterations", clear_on_submit=True):
+            col3, col4 = st.columns([1, 5])
+            # 분할처리 위한 기타 파라미터 입력
+            div_record_num = col3.number_input("한번에 처리할 레코드 수", min_value=0, step=1, help="처리할 레코드 수는 원본데이터 기준입니다.")
+            chunk_submit = st.form_submit_button("")
+
+
         if ("syn_data" in st.session_state) and ("raw_data" in st.session_state):
             if "syn_single_attr" not in st.session_state:
                 # 재현데이터 위험도 계산
