@@ -1,5 +1,6 @@
 import pandas as pd
 import funcs.preprocessing as pre
+import io
 
 #utility functions
 
@@ -46,3 +47,9 @@ def load_data_syn(file):
 
 def to_str(drop_list):
     return ", ".join(drop_list)
+
+def count_lines(path):
+    with open(path) as fp:
+        for (count, _) in enumerate(fp, 1):
+            pass
+    return count

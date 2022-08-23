@@ -1,6 +1,6 @@
 #modules
+from itertools import count
 import os
-from turtle import clear
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -10,7 +10,7 @@ import json
 
 #functions
 from funcs.risk_syn import compute_risk
-from funcs.utility import convert_df2csv
+from funcs.utility import convert_df2csv, count_lines
 from funcs.synthetic_reidentified import syn_reidentified_datas
     
 import timeit
@@ -19,18 +19,22 @@ class horiz_part:
         # 분할처리할 데이터 업로드
         col1, col2 = st.columns(2)
         col1.markdown("### 원본데이터")
-        raw_data_file = col1.file_uploader("원본데이터 업로드", type="csv")
+        split_raw_file = col1.file_uploader("원본데이터 업로드", type="csv")
 
         col2.markdown("### 재현데이터")
-        syn_data_file = col2.file_uploader("재현데이터 업로드", type="csv")
+        split_syn_file = col2.file_uploader("재현데이터 업로드", type="csv")
 
         div_record_num = 0
-        with st.form("number of iterations", clear_on_submit=True):
+        with st.form("number of iterations"):
             col3, col4 = st.columns([1, 5])
             # 분할처리 위한 기타 파라미터 입력
-            div_record_num = col3.number_input("한번에 처리할 레코드 수", min_value=0, step=1, help="처리할 레코드 수는 원본데이터 기준입니다.")
-            chunk_submit = st.form_submit_button("")
+            div_record_num = col3.number_input("한번에 처리할 레코드 수", min_value=0, step=10, help="처리할 레코드 수는 원본데이터 기준입니다.")
+            chunk_submit = st.form_submit_button("입력")
 
+        if chunk_submit:
+            # 원본 csv의 레코드수 세기
+            total_lines = count_lines(split_raw_file)
+            print(total_lines)
 
         if ("syn_data" in st.session_state) and ("raw_data" in st.session_state):
             if "syn_single_attr" not in st.session_state:
@@ -173,19 +177,19 @@ class horiz_part:
         col1, col2 = st.columns(2)
         col1.dataframe(st.session_state.syn_table.round(decimals = 4))
         #그래프 생성
-        fig, ax = plt.subplots(figsize=(4,4))
-        means = st.session_state.syn_table.iloc[0].iat[0]
-        mins = st.session_state.syn_table.iloc[0].iat[3]
-        maxes = st.session_state.syn_table.iloc[0].iat[2]
-        std = st.session_state.syn_table.iloc[0].iat[1]
-        ax.errorbar('Table Reidentification Risk', means, yerr=std, fmt='8r', markersize=10, ecolor='tab:blue', lw=10)
-        ax.errorbar('Table Reidentification Risk', means, yerr=[[means-mins],[maxes-means]],
-                    fmt='_r', ecolor='tab:orange', lw=3, capsize=3)
-        buf = BytesIO()
-        fig.savefig(buf, format="png")
-        show_table_risk = st.checkbox("그래프 보기", key="syn_table_graph")
-        if show_table_risk:
-            col2.image(buf)
+        # fig, ax = plt.subplots(figsize=(4,4))
+        # means = st.session_state.syn_table.iloc[0].iat[0]
+        # mins = st.session_state.syn_table.iloc[0].iat[3]
+        # maxes = st.session_state.syn_table.iloc[0].iat[2]
+        # std = st.session_state.syn_table.iloc[0].iat[1]
+        # ax.errorbar('Table Reidentification Risk', means, yerr=std, fmt='8r', markersize=10, ecolor='tab:blue', lw=10)
+        # ax.errorbar('Table Reidentification Risk', means, yerr=[[means-mins],[maxes-means]],
+        #             fmt='_r', ecolor='tab:orange', lw=3, capsize=3)
+        # buf = BytesIO()
+        # fig.savefig(buf, format="png")
+        # show_table_risk = st.checkbox("그래프 보기", key="syn_table_graph")
+        # if show_table_risk:
+        #     col2.image(buf)
         
     #속성 재식별 위험도 탭
     def syn_attr(self):
@@ -198,20 +202,20 @@ class horiz_part:
         )
         st.dataframe(st.session_state.syn_one_attr.round(decimals = 4))
         #그래프 생성
-        fig, ax = plt.subplots(figsize=(12,4))
-        means = st.session_state.syn_one_attr['mean']
-        mins = st.session_state.syn_one_attr['min']
-        maxes = st.session_state.syn_one_attr['max']
-        std = st.session_state.syn_one_attr['std']
-        errors = pd.concat([means-mins,maxes-means], axis=1)
-        ax.errorbar(st.session_state.syn_one_attr.index, means, yerr=std, fmt='8r', markersize=10, ecolor='tab:blue', lw=10)
-        ax.errorbar(st.session_state.syn_one_attr.index, means, yerr=errors.T,
-                    fmt='_r', ecolor='tab:orange', lw=3, capsize=3)
-        buf = BytesIO()
-        fig.savefig(buf, format="png")
-        show_attr_risk = st.checkbox("그래프 보기", key="syn_attr_graph")
-        if show_attr_risk:
-            st.image(buf)
+        # fig, ax = plt.subplots(figsize=(12,4))
+        # means = st.session_state.syn_one_attr['mean']
+        # mins = st.session_state.syn_one_attr['min']
+        # maxes = st.session_state.syn_one_attr['max']
+        # std = st.session_state.syn_one_attr['std']
+        # errors = pd.concat([means-mins,maxes-means], axis=1)
+        # ax.errorbar(st.session_state.syn_one_attr.index, means, yerr=std, fmt='8r', markersize=10, ecolor='tab:blue', lw=10)
+        # ax.errorbar(st.session_state.syn_one_attr.index, means, yerr=errors.T,
+        #             fmt='_r', ecolor='tab:orange', lw=3, capsize=3)
+        # buf = BytesIO()
+        # fig.savefig(buf, format="png")
+        # show_attr_risk = st.checkbox("그래프 보기", key="syn_attr_graph")
+        # if show_attr_risk:
+        #     st.image(buf)
 
     # 속성값 재식별 위험도 탭
     def syn_attr_val(self):
