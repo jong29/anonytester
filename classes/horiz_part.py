@@ -3,8 +3,6 @@ from itertools import count
 import os
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-from io import BytesIO
 from pathlib import Path
 import json
 
@@ -17,6 +15,7 @@ import timeit
 class horiz_part:
     def __init__(self):
         # 분할처리할 데이터 업로드
+        st.subheader("재현데이터 재식별도 수평 분할 처리")
         col1, col2 = st.columns(2)
         col1.markdown("### 원본데이터")
         split_raw_file = col1.file_uploader("원본데이터 업로드", type="csv")
@@ -24,34 +23,26 @@ class horiz_part:
         col2.markdown("### 재현데이터")
         split_syn_file = col2.file_uploader("재현데이터 업로드", type="csv")
 
-        #first raw data upload
-        if (split_raw_file is not None) and ("raw_data" not in st.session_state):
-            try:
-                # before was df, but now would be iterator
-                st.session_state.raw_data  = util.load_data_raw(split_raw_file)
-            except ValueError as er:
-                st.error(f"ValueError {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n원본데이터인지 확인해주세요.")
-
-        # first synthetic data upload
-        if (split_syn_file is not None) and ("syn_data" not in st.session_state):
-            try:
-                with st.spinner("재현데이터 속성별 처리중..."):
-                    st.session_state.syn_data = util.load_data_syn(split_syn_file)
-                    st.experimental_rerun()
-            except KeyError as er:
-                st.error(f"KeyError: {er}  \n업로드된 파일의 포맷이 잘못되었습니다.  \n재현데이터인지 확인해주세요.")
-
-
+        # 분할처리 위한 기타 파라미터 입력
         with st.form("number of iterations"):
             col3, col4 = st.columns([1, 3])
-            # 분할처리 위한 기타 파라미터 입력
             st.session_state.div_num = col3.number_input("한번에 처리할 레코드 수", min_value=0, step=10, help="처리할 레코드 수는 원본데이터 기준입니다.")
             chunk_submit = st.form_submit_button("입력")
 
+        #first raw data upload
+
         if chunk_submit:
             # 원본 csv의 레코드수 세기
-            total_lines = count_lines(st.session_state.split_raw_file)
-            print(total_lines)
+            # total_lines = util.count_lines(st.session_state.split_raw_file)
+            # print(total_lines)
+
+            if (split_raw_file is not None) and ("raw_data" not in st.session_state):
+                # before was df, but now would be iterator
+                st.session_state.raw_chunk  = util.load_raw_iter(split_raw_file, st.session_state.div_num)
+
+            # first synthetic data upload
+            if (split_syn_file is not None) and ("syn_data" not in st.session_state):
+                st.session_state.syn_data = util.load_raw_iter(split_syn_file, st.session_state.div_num)
 
         if ("split_raw_file" in st.session_state) and ("split_syn_file" in st.session_state):
             # 원본 재현데이터 칼럼 동일한지 확인
@@ -63,22 +54,13 @@ class horiz_part:
             except:
                 st.warning("원본데이터와 재현데이터의 속성이 다릅니다.")
 
-            # 기타 지표 계산 (재현데이터 위험도)
-            if "syn_single_attr" not in st.session_state:
-                with st.spinner("데이터 로딩중..."):
-                    st.session_state.syn_single_attr, st.session_state.syn_one_attr, st.session_state.syn_record, st.session_state.syn_table \
-                        = compute_risk(st.session_state.syn_data.copy())
+        tab1, tab2 = st.tabs(["재식별도", "진행정보"])
+        with tab1:
+            self.syn_reid()
+        with tab2:
+            self.progress_info()
 
-            tab1, tab2 = st.tabs(["재식별도", "진행정보"])
-            with tab1:
-                self.syn_reid()
-            with tab2:
-                self.progress_info()
-
-    #재현데이터 재식별도 탭
     def syn_reid(self):
-        self.reid_info()
-        st.subheader("재현데이터 재식별도 수평 분할 처리")
         start_cont = st.form("reid_calc")
         col0, col1, col2, col3, col4 = start_cont.columns([0.3, 5, 1, 20, 1])
         dims = col3.slider('재식별도 계산 Dimension을 선택',
@@ -90,14 +72,19 @@ class horiz_part:
 
         if start_button:
             start = timeit.default_timer()
+
+            #재식별 위험도
+            with st.spinner("데이터 로딩중..."):
+                st.session_state.syn_single_attr, st.session_state.syn_one_attr, st.session_state.syn_record, st.session_state.syn_table \
+                    = compute_risk(st.session_state.syn_data.copy())
+
+            # 재식별도
             st.session_state.syn_reidentified, st.session_state.dropped_cols_syn = syn_reidentified_datas(\
                 st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr,\
                 K=record_num,start_dim=dims[0],end_dim=dims[1])
             stop = timeit.default_timer()
             reidentified_res.write(f"계산 시간: {stop-start}")
             
-            # ------- 재식별도 계산 완료 -------
-
             # 재식별 데이터 저장 디렉토리 강제 생성
             default_dir_path = str(Path.home()) + "/Desktop/Anonytest/"
             synfile_dir_path = default_dir_path + st.session_state.syn_file_name[:-4]
@@ -178,17 +165,6 @@ class horiz_part:
     def progress_info(self):
         pass
 
-    # 레코드 재식별 위험도 탭
-    def syn_record(self):
-        st.subheader('레코드 재식별 위험도')
-        st.download_button(
-            label="레코드 재식별 위험도 csv로 저장",
-            data = convert_df2csv(st.session_state.syn_record),
-            file_name=st.session_state.syn_file_name[:-4] + '_레코드 재식별 위험도.csv',
-            mime='text/csv',
-        )
-        st.dataframe(st.session_state.syn_record.round(decimals = 4).head(200))
-
     def create_dirs(self, default_dir_path, synfile_dir_path):
         # anonytester 기본 디렉토리 생성
         try:
@@ -201,28 +177,3 @@ class horiz_part:
             os.mkdir(synfile_dir_path)
         except FileExistsError:
             pass
-
-    # 재식별도 계산된 기록(메타데이터) 표시
-    def reid_info(self):
-        st.subheader('재식별 데이터 검사 기록')
-        json_file_path = str(Path.home()) + "/Desktop/Anonytest/" + st.session_state.syn_file_name[:-4] + '/metadata.json'
-        if os.path.exists(json_file_path):
-            with open(json_file_path, 'r', encoding = 'utf-8') as f:
-                meta_dict = json.load(f)
-            if meta_dict["dims_remaining"][0] == -1:
-                st.success("젠체 디멘션 계산 완료했습니다!")
-            else:
-                st.warning(f'계산 되지 않은 디멘션: {meta_dict["dims_remaining"][0]} 에서 {meta_dict["dims_remaining"][1]}')
-
-            st.markdown(f"""
-                <div>
-                    <p style="font-size:18px;"> 전체 디멘션 수: {meta_dict["raw_data_attr_num"]} </p>
-                    <p style="font-size:18px;"> 현재까지 재식별된 레코드 수: {meta_dict["reid_record"]} </p>
-                    <p style="font-size:18px;"> 현재까지 계산된 재식별도: {meta_dict["reid_rate"]:.3f} </p>
-                    <p style="font-size:18px;"> 검사 완료한 재식별 데이터 디멘션: </p>
-                </div>
-            """, unsafe_allow_html=True)
-            for dim in meta_dict["files_to_combine"]:
-                st.write(dim)
-        else:
-            st.markdown('<p style="color: grey; font-size: 22px; font-weight: bold">재식별도 검사 기록이 없습니다</p>', unsafe_allow_html=True)

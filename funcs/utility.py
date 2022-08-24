@@ -29,6 +29,7 @@ def comb_org(df2org):
     df2org.drop('Unnamed: 0', axis=1, inplace=True)
     return df2org
 
+# 일반 원본
 def load_data_raw(file):
     try:
         df = pd.read_csv(file, encoding='utf-8')
@@ -37,12 +38,29 @@ def load_data_raw(file):
     df = pre.preprocessing_raw(df)
     return df
 
-def load_data_syn(file):
+# 수평분할 원본
+def load_raw_iter(file):
+    try:
+        df = pd.read_csv(file, encoding='utf-8')
+    except ValueError:
+        df = pd.read_csv(file, encoding='cp949')
+    return df
+
+# 일반 재현
+def load_data_syn(file, records):
     try:
         df = pd.read_csv(file, encoding='utf-8')
     except ValueError:
         df = pd.read_csv(file, encoding='cp949')
     df = pre.preprocessing_syn(df)
+    return df
+
+# 수평분할 재현
+def load_syn_iter(file, records):
+    try:
+        df = pd.read_csv(file, encoding='utf-8')
+    except ValueError:
+        df = pd.read_csv(file, encoding='cp949')
     return df
 
 def to_str(drop_list):
