@@ -26,23 +26,23 @@ class horiz_part:
         # 분할처리 위한 기타 파라미터 입력
         with st.form("number of iterations"):
             col3, col4 = st.columns([1, 3])
-            st.session_state.div_num = col3.number_input("한번에 처리할 레코드 수", min_value=0, step=10, help="처리할 레코드 수는 원본데이터 기준입니다.")
+            st.session_state.div_num = col3.number_input("한번에 처리할 레코드 수", min_value=0, step=10, help="처리할 레코드 수는 재현데이터 기준입니다.")
             chunk_submit = st.form_submit_button("입력")
 
         #first raw data upload
 
         if chunk_submit:
-            # 원본 csv의 레코드수 세기
-            # total_lines = util.count_lines(st.session_state.split_raw_file)
-            # print(total_lines)
-
             if (split_raw_file is not None) and ("raw_data" not in st.session_state):
                 # before was df, but now would be iterator
                 st.session_state.raw_chunk  = util.load_raw_iter(split_raw_file, st.session_state.div_num)
 
             # first synthetic data upload
             if (split_syn_file is not None) and ("syn_data" not in st.session_state):
-                st.session_state.syn_data = util.load_raw_iter(split_syn_file, st.session_state.div_num)
+                st.session_state.syn_chunk = util.load_raw_iter(split_syn_file, st.session_state.div_num)
+            
+            # 원본 csv의 레코드수 세기
+            total_lines = util.count_lines(st.session_state.syn_chunk)
+            st.write(f"total records {total_lines}")
 
         if ("split_raw_file" in st.session_state) and ("split_syn_file" in st.session_state):
             # 원본 재현데이터 칼럼 동일한지 확인

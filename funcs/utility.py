@@ -66,8 +66,8 @@ def load_syn_iter(file, records):
 def to_str(drop_list):
     return ", ".join(drop_list)
 
-def count_lines(path):
-    with open(path) as fp:
-        for (count, _) in enumerate(fp, 1):
-            pass
-    return count
+def count_lines(syn_file_iterator):
+    for chunk_number, chunk in enumerate(syn_file_iterator):
+    # some code here, if needed
+        pass
+    return chunk_number+1
