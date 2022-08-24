@@ -60,8 +60,7 @@ class syn_page:
         if start_button:
             start = timeit.default_timer()
             st.session_state.syn_reidentified, st.session_state.dropped_cols_syn = syn_reidentified_datas(\
-                st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr,\
-                K=record_num,start_dim=dims[0],end_dim=dims[1])
+                st.session_state.raw_data, st.session_state.syn_data, K=record_num,start_dim=dims[0],end_dim=dims[1])
             stop = timeit.default_timer()
             reidentified_res.write(f"계산 시간: {stop-start}")
             

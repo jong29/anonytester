@@ -31,7 +31,7 @@ def get_all_combinations(data, start_dim=1,end_dim=-1):
     return list(all_combinations)
 
 @st.cache(suppress_st_warning=True, show_spinner=False)
-def syn_reidentified_datas(raw_data, syn_data, syn_one_attr, K=-1, start_dim=1, end_dim=-1):
+def syn_reidentified_datas(raw_data, syn_data, K=-1, start_dim=1, end_dim=-1):
 
     if(K==-1):
         K=len(syn_data)
