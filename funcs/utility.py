@@ -38,16 +38,17 @@ def load_data_raw(file):
     df = pre.preprocessing_raw(df)
     return df
 
-# 수평분할 원본
-def load_raw_iter(file):
+# 수평분할
+# 메모리에 전부 올리지 않고 records수만큼 chunksize별로 읽어옴
+def load_iter(file, records):
     try:
-        df = pd.read_csv(file, encoding='utf-8')
+        df = pd.read_csv(file, encoding='utf-8', chunksize=records)
     except ValueError:
-        df = pd.read_csv(file, encoding='cp949')
+        df = pd.read_csv(file, encoding='cp949', chunksize=records)
     return df
 
 # 일반 재현
-def load_data_syn(file, records):
+def load_data_syn(file):
     try:
         df = pd.read_csv(file, encoding='utf-8')
     except ValueError:
@@ -55,17 +56,10 @@ def load_data_syn(file, records):
     df = pre.preprocessing_syn(df)
     return df
 
-# 수평분할 재현
-def load_syn_iter(file, records):
-    try:
-        df = pd.read_csv(file, encoding='utf-8')
-    except ValueError:
-        df = pd.read_csv(file, encoding='cp949')
-    return df
-
 def to_str(drop_list):
     return ", ".join(drop_list)
 
+# 재현데이터 파일 iterable object 받아서 파일안에 chunk 개수 반환
 def count_lines(syn_file_iterator):
     for chunk_number, chunk in enumerate(syn_file_iterator):
     # some code here, if needed

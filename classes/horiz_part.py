@@ -29,20 +29,20 @@ class horiz_part:
             st.session_state.div_num = col3.number_input("한번에 처리할 레코드 수", min_value=0, step=10, help="처리할 레코드 수는 재현데이터 기준입니다.")
             chunk_submit = st.form_submit_button("입력")
 
-        #first raw data upload
+            #first raw data upload
 
-        if chunk_submit:
-            if (split_raw_file is not None) and ("raw_data" not in st.session_state):
-                # before was df, but now would be iterator
-                st.session_state.raw_chunk  = util.load_raw_iter(split_raw_file, st.session_state.div_num)
+            if chunk_submit:
+                if (split_raw_file is not None) and ("raw_data" not in st.session_state):
+                    # before was df, but now would be iterator
+                    st.session_state.raw_chunk  = util.load_iter(split_raw_file, st.session_state.div_num)
 
-            # first synthetic data upload
-            if (split_syn_file is not None) and ("syn_data" not in st.session_state):
-                st.session_state.syn_chunk = util.load_raw_iter(split_syn_file, st.session_state.div_num)
-            
-            # 원본 csv의 레코드수 세기
-            total_lines = util.count_lines(st.session_state.syn_chunk)
-            st.write(f"total records {total_lines}")
+                # first synthetic data upload
+                if (split_syn_file is not None) and ("syn_data" not in st.session_state):
+                    st.session_state.syn_chunk = util.load_iter(split_syn_file, st.session_state.div_num)
+                
+                # 원본 csv의 레코드수 세기
+                chunk_no = util.count_lines(st.session_state.syn_chunk)
+                st.write(f"number of chunks {chunk_no}")
 
         if ("split_raw_file" in st.session_state) and ("split_syn_file" in st.session_state):
             # 원본 재현데이터 칼럼 동일한지 확인
@@ -61,19 +61,21 @@ class horiz_part:
             self.progress_info()
 
     def syn_reid(self):
-        start_cont = st.form("reid_calc")
-        col0, col1, col2, col3, col4 = start_cont.columns([0.3, 5, 1, 20, 1])
-        dims = col3.slider('재식별도 계산 Dimension을 선택',
-                            1, len(st.session_state.raw_data.columns),(1, len(st.session_state.raw_data.columns)))
-        record_num = col1.number_input("재식별 확인 레코드 수", min_value=-1, step=1, help="-1을 입력하시면 전체를 확인합니다.")
+        pass
+        '''
+        with st.form("reid_calc"):
+            col2_0, col2_1, col2_2, col2_3, col2_4 = st.columns([0.3, 5, 1, 20, 1])
+            dims = col2_3.slider('재식별도 계산 Dimension을 선택',  
+                                1, len(st.session_state.raw_data.columns),(1, len(st.session_state.raw_data.columns)))
+            record_num = col2_1.number_input("재식별 확인 레코드 수", min_value=-1, step=1, help="-1을 입력하시면 전체를 확인합니다.")
 
-        start_button = col1.form_submit_button("재식별도 계산 시작")
+            start_button = col2_3.form_submit_button("재식별도 계산 시작")
+        
         reidentified_res = st.container()
-
         if start_button:
             start = timeit.default_timer()
 
-            #재식별 위험도
+            #재식별 위험도  
             with st.spinner("데이터 로딩중..."):
                 st.session_state.syn_single_attr, st.session_state.syn_one_attr, st.session_state.syn_record, st.session_state.syn_table \
                     = compute_risk(st.session_state.syn_data.copy())
@@ -161,6 +163,7 @@ class horiz_part:
                     drop_str += str(st.session_state.dropped_cols_syn[i])
                 st.markdown("##### " + drop_str)
             st.session_state.syn_reid_done = True
+            '''
             
     def progress_info(self):
         pass
