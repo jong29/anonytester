@@ -62,7 +62,7 @@ class syn_page:
             st.session_state.syn_reidentified, st.session_state.dropped_cols_syn = syn_reidentified_datas(\
                 st.session_state.raw_data, st.session_state.syn_data, K=record_num,start_dim=dims[0],end_dim=dims[1])
             stop = timeit.default_timer()
-            reidentified_res.write(f"계산 시간: {stop-start}")
+            reidentified_res.write(f"계산 시간(초): {stop-start}")
             
             # ------- 재식별도 계산 완료 -------
 

@@ -1,10 +1,6 @@
 #modules
 import streamlit as st
 import funcs.utility as util
-
-#functions
-from funcs.raw_reidentified import get_all_combinations
-
 class home:
     def __init__(self):
         st.markdown(
@@ -58,12 +54,10 @@ class home:
                 st.experimental_rerun()
             with col1.expander("입력 데이터 확인"):
                 raw_preview = st.session_state.raw_data[:100]
-                # st.session_state.raw_comb_num = len(get_all_combinations(st.session_state.raw_data))
                 st.markdown(f"### {st.session_state.raw_file_name}")
                 st.write(f"제거된 속성: {st.session_state.drop_raw_disp}")
                 st.caption(f"레코드 수: {len(st.session_state.raw_data)}\
                     \n속성 수: {len(st.session_state.raw_data.columns)}")
-                    # \n속성 조합 수 {st.session_state.raw_comb_num}")
                 st.dataframe(raw_preview)
 
         # synthetic data uploader
@@ -112,10 +106,8 @@ class home:
     
             with col2.expander("입력 데이터 확인"):
                 syn_preview = st.session_state.syn_data[:100]
-                st.session_state.syn_comb_num = len(get_all_combinations(st.session_state.syn_data))
                 st.markdown(f"### {st.session_state.syn_file_name}")
                 st.write(f"제거된 속성: {st.session_state.drop_syn_disp}")
                 st.caption(f"레코드 수: {len(st.session_state.syn_data)}\
-                    \n속성 수: {len(st.session_state.syn_data.columns)}\
-                    \n속성 조합 수 {st.session_state.syn_comb_num}")
+                    \n속성 수: {len(st.session_state.syn_data.columns)}")
                 st.dataframe(syn_preview)

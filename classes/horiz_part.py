@@ -25,9 +25,9 @@ class horiz_part:
 
         # 분할처리 위한 기타 파라미터 입력
         with st.form("number of iterations"):
-            col3, col4 = st.columns([1, 3])
+            col3, col4, col5, col6 = st.columns([3,1,3,1])
             st.session_state.div_num = col3.number_input("한번에 처리할 레코드 수", min_value=0, step=10, help="처리할 레코드 수는 재현데이터 기준입니다.")
-            chunk_submit = st.form_submit_button("입력")
+            chunk_submit = col3.form_submit_button("레코드 입력")
 
             #first raw data upload
 
@@ -42,7 +42,12 @@ class horiz_part:
                 
                 # 원본 csv의 레코드수 세기
                 chunk_no = util.count_lines(st.session_state.syn_chunk)
-                st.write(f"number of chunks {chunk_no}")
+
+                st.session_state.repeat_num = col5.number_input("반복 실행 횟수", min_value=1, max_value=chunk_no, step=10)
+                chunk_submit2 = col5.form_submit_button("반복 횟수 입력")
+
+                st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {chunk_no}횝 반복해야 됩니다.")
+
 
         if ("split_raw_file" in st.session_state) and ("split_syn_file" in st.session_state):
             # 원본 재현데이터 칼럼 동일한지 확인
