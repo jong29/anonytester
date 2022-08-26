@@ -10,7 +10,9 @@ import sys
 #functions
 from funcs.risk_syn import compute_risk
 from funcs.synthetic_reidentified import syn_reidentified_datas
+from funcs.similarity import similarity
 import funcs.utility as util
+import funcs.preprocessing as prep
     
 import timeit
 class horiz_part:
@@ -37,18 +39,20 @@ class horiz_part:
             else:
                 chunk_update.empty()
                 st.session_state.repeat_num = chunk_update.number_input("반복 실행 횟수", min_value=1, max_value=st.session_state.chunk_no, step=1)
-                chunk_submit2 = col5.form_submit_button("반복 횟수 입력")
+                self.chunk_submit2 = col5.form_submit_button("반복 횟수 입력")
 
 
             if chunk_submit:
                 if (split_raw_file is not None) and ("raw_data" not in st.session_state):
                     # before was df, but now would be iterator
                     st.session_state.raw_chunk  = util.load_iter(split_raw_file, st.session_state.div_num)
+                    st.session_state.raw_chunk_cols = self.cols2list(split_raw_file)
 
                 # first synthetic data upload
                 if (split_syn_file is not None) and ("syn_data" not in st.session_state):
                     st.session_state.syn_chunk = util.load_iter(split_syn_file, st.session_state.div_num)
-                
+                    st.session_state.syn_chunk_cols = self.cols2list(split_syn_file)
+
                 # 원본 csv의 레코드수 세기
                 st.session_state.chunk_no = util.count_lines(st.session_state.syn_chunk)
 
@@ -73,32 +77,41 @@ class horiz_part:
             self.progress_info()
 
     def syn_reid(self):
-        pass
-        '''
-        with st.form("reid_calc"):
-            col2_0, col2_1, col2_2, col2_3, col2_4 = st.columns([0.3, 5, 1, 20, 1])
-            dims = col2_3.slider('재식별도 계산 Dimension을 선택',  
-                                1, len(st.session_state.raw_data.columns),(1, len(st.session_state.raw_data.columns)))
-            record_num = col2_1.number_input("재식별 확인 레코드 수", min_value=-1, step=1, help="-1을 입력하시면 전체를 확인합니다.")
+        if ("raw_chunk" in st.session_state) and ("syn_chunk" in st.session_state) and self.chunk_submit2:
+            with st.form("reid_calc"):
+                col2_0, col2_1, col2_2, col2_3, col2_4 = st.columns([0.3, 5, 1, 20, 1])
+                dims = col2_3.slider('재식별도 계산 Dimension을 선택',  
+                                    1, len(st.session_state.raw_chunk_cols),(1, len(st.session_state.syn_chunk_cols)))
+                record_num = col2_1.number_input("재식별 확인 레코드 수", min_value=-1, step=1, help="-1을 입력하시면 전체를 확인합니다.")
 
-            start_button = col2_3.form_submit_button("재식별도 계산 시작")
-        
-        reidentified_res = st.container()
-        if start_button:
-            start = timeit.default_timer()
-
-            #재식별 위험도  
-            with st.spinner("데이터 로딩중..."):
-                st.session_state.syn_single_attr, st.session_state.syn_one_attr, st.session_state.syn_record, st.session_state.syn_table \
-                    = compute_risk(st.session_state.syn_data.copy())
-
-            # 재식별도
-            st.session_state.syn_reidentified, st.session_state.dropped_cols_syn = syn_reidentified_datas(\
-                st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr,\
-                K=record_num,start_dim=dims[0],end_dim=dims[1])
-            stop = timeit.default_timer()
-            reidentified_res.write(f"계산 시간: {stop-start}")
+                start_button = col2_3.form_submit_button("재식별도 계산 시작")
             
+            reidentified_res = st.container()
+            if start_button:
+                start = timeit.default_timer()
+
+                #재식별 위험도  
+                for chunk in st.session_state.syn_chunk:
+                    # 전처리
+                    syn_df = prep.preprocessing_syn(chunk)
+                    st.write(syn_df)
+                    
+                    # 재식별 위험도
+                    st.session_state.syn_single_attr, st.session_state.syn_one_attr, st.session_state.syn_record, st.session_state.syn_table \
+                            = compute_risk(st.session_state.syn_data.copy())    
+
+                    # 유사도
+                    st.session_state.val_similarity, st.session_state.attr_similarity, st.session_state.record_similarity, st.session_state.table_similarity\
+                        = similarity(st.session_state.raw_data, st.session_state.syn_data, apply_hierarchy=False)
+
+                    # 재식별도
+                    st.session_state.syn_reidentified, st.session_state.dropped_cols_syn = syn_reidentified_datas(\
+                        st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr,\
+                        K=record_num,start_dim=dims[0],end_dim=dims[1])
+                    stop = timeit.default_timer()
+                    reidentified_res.write(f"계산 시간: {stop-start}")
+
+            '''
             # 재식별 데이터 저장 디렉토리 강제 생성
             default_dir_path = str(Path.home()) + "/Desktop/Anonytest/"
             synfile_dir_path = default_dir_path + st.session_state.syn_file_name[:-4]
@@ -192,3 +205,7 @@ class horiz_part:
             os.mkdir(synfile_dir_path)
         except FileExistsError:
             pass
+
+    def cols2list(self, file):
+        cols = pd.read_csv(file, index_col=0, nrows=0).columns.tolist()
+        return cols
