@@ -27,36 +27,37 @@ class horiz_part:
         split_syn_file = col2.file_uploader("재현데이터 업로드", type="csv")
 
         # 분할처리 위한 기타 파라미터 입력
-        with st.form("number of iterations"):
-            col3, col4, col5, col6 = st.columns([3,1,3,1])
-            st.session_state.div_num = col3.number_input("한번에 처리할 레코드 수", min_value=1 , value=1000, step=100, help="처리할 레코드 수는 재현데이터 기준입니다.")
-            chunk_submit = col3.form_submit_button("레코드 입력")
-            chunk_update = col5.empty()
+        if (split_raw_file is not None) and (split_syn_file is not None):
+            with st.form("number of iterations"):
+                col3, col4, col5, col6 = st.columns([3,1,3,1])
+                st.session_state.div_num = col3.number_input("한번에 처리할 레코드 수", min_value=1 , value=1000, step=100, help="처리할 레코드 수는 재현데이터 기준입니다.")
+                chunk_submit = col3.form_submit_button("레코드 입력")
+                chunk_update = col5.empty()
 
-            # initial state of chunk_no for iteration number input
-            if "chunk_no" not in st.session_state:
-                chunk_update.number_input("반복 실행 횟수", min_value=1, max_value=1, key="tmp_iter")
-            else:
-                chunk_update.empty()
-                st.session_state.repeat_num = chunk_update.number_input("반복 실행 횟수", min_value=1, max_value=st.session_state.chunk_no, step=1)
-                self.chunk_submit2 = col5.form_submit_button("반복 횟수 입력")
+                # initial state of chunk_no for iteration number input
+                if "chunk_no" not in st.session_state:
+                    chunk_update.number_input("반복 실행 횟수", min_value=1, max_value=1, key="tmp_iter")
+                else:
+                    chunk_update.empty()
+                    st.session_state.repeat_num = chunk_update.number_input("반복 실행 횟수", min_value=1, max_value=st.session_state.chunk_no, step=1)
+                    self.chunk_submit2 = col5.form_submit_button("반복 횟수 입력")
 
 
-            if chunk_submit:
-                if (split_raw_file is not None) and ("raw_data" not in st.session_state):
-                    # before was df, but now would be iterator
-                    st.session_state.raw_chunk  = util.load_iter(split_raw_file, st.session_state.div_num)
-                    st.session_state.raw_chunk_cols = self.cols2list(split_raw_file)
+                if chunk_submit:
+                    if (split_raw_file is not None) and ("raw_data" not in st.session_state):
+                        # before was df, but now would be iterator
+                        st.session_state.raw_chunk  = util.load_iter(split_raw_file, st.session_state.div_num)
+                        st.session_state.raw_chunk_cols = self.cols2list(split_raw_file)
 
-                # first synthetic data upload
-                if (split_syn_file is not None) and ("syn_data" not in st.session_state):
-                    st.session_state.syn_chunk = util.load_iter(split_syn_file, st.session_state.div_num)
-                    st.session_state.syn_chunk_cols = self.cols2list(split_syn_file)
+                    # first synthetic data upload
+                    if (split_syn_file is not None) and ("syn_data" not in st.session_state):
+                        st.session_state.syn_chunk = util.load_iter(split_syn_file, st.session_state.div_num)
+                        st.session_state.syn_chunk_cols = self.cols2list(split_syn_file)
 
-                # 원본 csv의 레코드수 세기
-                st.session_state.chunk_no = util.count_lines(st.session_state.syn_chunk)
+                    # 원본 csv의 레코드수 세기
+                    st.session_state.chunk_no = util.count_lines(st.session_state.syn_chunk)
 
-                st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {st.session_state.chunk_no}회 반복해야 됩니다.")
+                    st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {st.session_state.chunk_no}회 반복해야 됩니다.")
 
 
 
