@@ -18,16 +18,20 @@ import funcs.preprocessing as prep
 import timeit
 class horiz_part:
     def __init__(self):
-        self.chunk_submit2 = False
 
         # 분할처리할 데이터 업로드
         st.subheader("재현데이터 재식별도 수평 분할 처리")
         col1, col2 = st.columns(2)
-        col1.markdown("### 원본데이터")
+        col1.markdown("#### 원본데이터")
         split_raw_file = col1.file_uploader("원본데이터 업로드", type="csv")
 
-        col2.markdown("### 재현데이터")
+        col2.markdown("#### 재현데이터")
         split_syn_file = col2.file_uploader("재현데이터 업로드", type="csv")
+
+        if "repeat_num" not in st.session_state:
+            self.chunk_submit2 = False
+        else:
+            self.chunk_submit2 = True
 
         # 분할처리 위한 기타 파라미터 입력
         if (split_raw_file is not None) and (split_syn_file is not None):
@@ -76,7 +80,7 @@ class horiz_part:
             except:
                 st.warning("원본데이터와 재현데이터의 속성이 다릅니다.")
 
-        if self.chunk_submit2 or ("repeat_num" in st.session_state):
+        if self.chunk_submit2:
             tab1, tab2 = st.tabs(["재식별도", "진행정보"])
             with tab1:
                 self.syn_reid()
