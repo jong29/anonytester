@@ -41,7 +41,6 @@ class horiz_part:
                 if "chunk_no" not in st.session_state:
                     chunk_update.number_input("반복 실행 횟수", min_value=1, max_value=1, key="tmp_iter")
                 else:
-                    # chunk_update.empty()
                     st.session_state.repeat_num = chunk_update.number_input("반복 실행 횟수", min_value=1, max_value=st.session_state.chunk_no, step=1)
                     self.chunk_submit2 = col5.form_submit_button("반복 횟수 입력")
 
@@ -56,11 +55,11 @@ class horiz_part:
                     # first synthetic data upload
                     if (split_syn_file is not None) and ("syn_chunk" not in st.session_state):
                         st.session_state.syn_chunk = util.load_iter(split_syn_file, st.session_state.div_num)
-                        st.session_state.raw_chunk_cols = pd.read_csv(split_syn_file, encoding='utf-8', index_col=0, nrows=0).columns.tolist()
+                        st.session_state.syn_chunk_cols = pd.read_csv(split_syn_file, encoding='utf-8', index_col=0, nrows=0).columns.tolist()
 
                     # 원본 csv의 레코드수 세기
                     st.session_state.chunk_no = util.count_iterations(st.session_state.syn_chunk)
-                    st.experimental_rerun()
+                    st.experimental_rerun() # 스크립트 재실행 하여야 "반복 실행 횟수"의 else 부분 작동
                 
                 if "chunk_no" in st.session_state:
                     st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {st.session_state.chunk_no}회 반복해야 됩니다.")
@@ -77,14 +76,15 @@ class horiz_part:
             except:
                 st.warning("원본데이터와 재현데이터의 속성이 다릅니다.")
 
-        tab1, tab2 = st.tabs(["재식별도", "진행정보"])
-        with tab1:
-            self.syn_reid()
-        with tab2:
-            self.progress_info()
+        if self.chunk_submit2 or ("repeat_num" in st.session_state):
+            tab1, tab2 = st.tabs(["재식별도", "진행정보"])
+            with tab1:
+                self.syn_reid()
+            with tab2:
+                self.progress_info()
 
     def syn_reid(self):
-        if ("raw_chunk" in st.session_state) and ("syn_chunk" in st.session_state) and self.chunk_submit2:
+        if ("raw_chunk" in st.session_state) and ("syn_chunk" in st.session_state):
             with st.form("reid_calc"):
                 col2_0, col2_1, col2_2, col2_3, col2_4 = st.columns([0.3, 5, 1, 20, 1])
                 dims = col2_3.slider('재식별도 계산 Dimension을 선택',  
@@ -102,19 +102,22 @@ class horiz_part:
                     # 전처리
                     syn_df = prep.preprocessing_syn(chunk)
                     st.write(syn_df)
+                    raw_df = prep.preprocessing_raw(chunk)
+                    st.write(raw_df)
                     
                     # 재식별 위험도
-                    st.session_state.syn_single_attr, st.session_state.syn_one_attr, st.session_state.syn_record, st.session_state.syn_table \
-                            = compute_risk(st.session_state.syn_data.copy())    
+                    _, _, _, st.session_state.syn_table = compute_risk(st.session_state.syn_df.copy())
+                    st.write(st.session_state.syn_table)
 
                     # 유사도
-                    st.session_state.val_similarity, st.session_state.attr_similarity, st.session_state.record_similarity, st.session_state.table_similarity\
-                        = similarity(st.session_state.raw_data, st.session_state.syn_data, apply_hierarchy=False)
+                    _, _, _, st.session_state.table_similarity = similarity(st.session_state.raw_df, st.session_state.syn_df, apply_hierarchy=False)
+                    st.write(st.session_state.table_similarity)
 
                     # 재식별도
                     st.session_state.syn_reidentified, st.session_state.dropped_cols_syn = syn_reidentified_datas(\
-                        st.session_state.raw_data, st.session_state.syn_data, st.session_state.syn_one_attr,\
-                        K=record_num,start_dim=dims[0],end_dim=dims[1])
+                        st.session_state.raw_df, st.session_state.syn_df, K=record_num, start_dim=dims[0], end_dim=dims[1])
+                    st.write(st.session_state.syn_reidentified)
+
                     stop = timeit.default_timer()
                     reidentified_res.write(f"계산 시간: {stop-start}")
 

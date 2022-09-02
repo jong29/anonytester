@@ -47,7 +47,7 @@ class raw_page:
         #재식별도 계산 진행
         if start_button:
             start = timeit.default_timer()
-            st.session_state.raw_reidentified, st.session_state.dropped_cols_raw = raw_reidentified_datas(st.session_state.raw_data, st.session_state.raw_one_attr, K=record_num,start_dim=dims[0],end_dim=dims[1])
+            st.session_state.raw_reidentified, st.session_state.dropped_cols_raw = raw_reidentified_datas(st.session_state.raw_data, K=record_num,start_dim=dims[0],end_dim=dims[1])
             stop = timeit.default_timer()
             st.write(f"계산 시간: {stop - start}")
             

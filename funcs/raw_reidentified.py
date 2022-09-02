@@ -62,7 +62,7 @@ start_dim:  속성 조합 시작 dimension (get_all_combinations 함수에 설�
 end_dim:    속성 조합 끝 dimension   (get_all_combinations 함수에 설명 있음)
 """
 @st.cache(suppress_st_warning=True, show_spinner=False)
-def raw_reidentified_datas(raw_data, one_attr, K=-1, start_dim=1, end_dim=-1):
+def raw_reidentified_datas(raw_data, K=-1, start_dim=1, end_dim=-1):
     #=============원본 재식별도=============
     #K가 -1이면 전부 검사 (데이터 길이만큼)
     if(K==-1):
