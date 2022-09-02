@@ -6,6 +6,7 @@ import pandas as pd
 from pathlib import Path
 import json
 import sys
+import copy
 
 #functions
 from funcs.risk_syn import compute_risk
@@ -13,10 +14,12 @@ from funcs.synthetic_reidentified import syn_reidentified_datas
 from funcs.similarity import similarity
 import funcs.utility as util
 import funcs.preprocessing as prep
-    
+
 import timeit
 class horiz_part:
     def __init__(self):
+        self.chunk_submit2 = False
+
         # 분할처리할 데이터 업로드
         st.subheader("재현데이터 재식별도 수평 분할 처리")
         col1, col2 = st.columns(2)
@@ -38,25 +41,28 @@ class horiz_part:
                 if "chunk_no" not in st.session_state:
                     chunk_update.number_input("반복 실행 횟수", min_value=1, max_value=1, key="tmp_iter")
                 else:
-                    chunk_update.empty()
+                    # chunk_update.empty()
                     st.session_state.repeat_num = chunk_update.number_input("반복 실행 횟수", min_value=1, max_value=st.session_state.chunk_no, step=1)
                     self.chunk_submit2 = col5.form_submit_button("반복 횟수 입력")
 
 
                 if chunk_submit:
-                    if (split_raw_file is not None) and ("raw_data" not in st.session_state):
+                    if (split_raw_file is not None) and ("raw_chunk" not in st.session_state):
                         # before was df, but now would be iterator
+                        cop_raw_file = copy.copy(split_raw_file)
                         st.session_state.raw_chunk  = util.load_iter(split_raw_file, st.session_state.div_num)
-                        st.session_state.raw_chunk_cols = self.cols2list(split_raw_file)
+                        st.session_state.raw_chunk_cols = pd.read_csv(cop_raw_file, encoding='utf-8', index_col=0, nrows=0).columns.tolist()
 
                     # first synthetic data upload
-                    if (split_syn_file is not None) and ("syn_data" not in st.session_state):
+                    if (split_syn_file is not None) and ("syn_chunk" not in st.session_state):
                         st.session_state.syn_chunk = util.load_iter(split_syn_file, st.session_state.div_num)
-                        st.session_state.syn_chunk_cols = self.cols2list(split_syn_file)
+                        st.session_state.raw_chunk_cols = pd.read_csv(split_syn_file, encoding='utf-8', index_col=0, nrows=0).columns.tolist()
 
                     # 원본 csv의 레코드수 세기
-                    st.session_state.chunk_no = util.count_lines(st.session_state.syn_chunk)
-
+                    st.session_state.chunk_no = util.count_iterations(st.session_state.syn_chunk)
+                    st.experimental_rerun()
+                
+                if "chunk_no" in st.session_state:
                     st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {st.session_state.chunk_no}회 반복해야 됩니다.")
 
 
@@ -208,5 +214,5 @@ class horiz_part:
             pass
 
     def cols2list(self, file):
-        cols = pd.read_csv(file, index_col=0, nrows=0).columns.tolist()
+        cols = pd.read_csv(file, encoding='utf-8', index_col=0).columns.tolist()
         return cols
