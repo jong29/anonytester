@@ -17,7 +17,6 @@ def find_unique_data(data, comb):
     unique = pd.DataFrame(data[list(comb)].drop_duplicates(keep=False)).reset_index()
     return unique
 
-@st.cache(suppress_st_warning=True, show_spinner=False)
 def get_all_combinations(data, start_dim=1,end_dim=-1):
     all_combinations = list()
     if(start_dim == -1):
@@ -30,7 +29,6 @@ def get_all_combinations(data, start_dim=1,end_dim=-1):
         all_combinations += combinations_list
     return list(all_combinations)
 
-@st.cache(suppress_st_warning=True, show_spinner=False)
 def syn_reidentified_datas(raw_data, syn_data, K=-1, start_dim=1, end_dim=-1):
 
     if(K==-1):
@@ -43,11 +41,10 @@ def syn_reidentified_datas(raw_data, syn_data, K=-1, start_dim=1, end_dim=-1):
     Priority = raw_data.nunique().sort_values(ascending=False).index
     raw_data =  raw_data.reindex(columns = Priority)
     combs = get_all_combinations(raw_data, start_dim, end_dim)
-    loop = stqdm(list(combs))
 
     temp_uniques=pd.DataFrame()
     syn_reident=pd.DataFrame()
-    for comb in loop:
+    for comb in list(combs):
         raw_unique = find_unique_data(raw_data,comb)
         syn_unique = find_unique_data(syn_data,comb)
         if((len(raw_unique) != 0) & (len(syn_unique) != 0)):

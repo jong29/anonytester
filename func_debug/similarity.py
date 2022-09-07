@@ -107,15 +107,14 @@ def val_similarity(raw_data, syn_data, apply_hierarchy=False):
             for col in cat_loop:
                 similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(category_similarity_hier, args=[similarity_df[col+"_x"].nunique(), col, hierarchy_df], axis=1)
     else:
-        with st.spinner("수치형 데이터 계산중..."):
-            num_loop = stqdm(list(numeric_cols))
-            for col in num_loop:
-                similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(numeric_similarity, \
-                                                                        args=(similarity_df[col+"_x"].max(),similarity_df[col+"_x"].min()), axis=1)
-        with st.spinner("범주형 데이터 계산중..."):
-            cat_loop = stqdm(list(category_cols))
-            for col in cat_loop:
-                similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(category_similarity, args=[similarity_df[col+"_x"].nunique()], axis=1)
+        # with st.spinner("수치형 데이터 계산중..."):
+            # num_loop = stqdm(list(numeric_cols))
+        for col in list(numeric_cols):
+            similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(numeric_similarity, args=(similarity_df[col+"_x"].max(),similarity_df[col+"_x"].min()), axis=1)
+        # with st.spinner("범주형 데이터 계산중..."):
+            # cat_loop = stqdm(list(category_cols))
+        for col in list(category_cols):
+            similarity_df[col] = similarity_df[[col+"_x",col+"_y"]].apply(category_similarity, args=[similarity_df[col+"_x"].nunique()], axis=1)
 
     similarity_df = similarity_df[raw_cols]
     return similarity_df
@@ -147,7 +146,6 @@ def table_similarity(record_similarity_df):
                                     columns = ['mean', 'std', 'max', 'min']) 
     return table_similarity_df
 
-@st.cache(show_spinner=False, suppress_st_warning=True)
 def similarity(raw_data, syn_data, apply_hierarchy):
     val_similarity_df = val_similarity(raw_data,syn_data,apply_hierarchy)
     attr_similarity_df = attr_simiarlity(val_similarity_df)

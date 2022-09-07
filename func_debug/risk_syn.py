@@ -55,7 +55,6 @@ def table_risk(record_risk):
     table_risk = table_risk.rename(index={"평균":"테이블 재식별 위험도"})
     return table_risk 
 
-@st.cache(show_spinner=False,suppress_st_warning=True)
 def compute_risk(dataframe):
     single_attr = single_attr_value_risk(dataframe)
     one_attr = one_attr_risk(single_attr)
