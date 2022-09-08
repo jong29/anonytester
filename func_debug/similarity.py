@@ -17,7 +17,7 @@ def category_similarity(vec, distinct):
     raw_cate     = vec[0]
     syn_cate     = vec[1]
     syn_connected = syn_cate.count(delimiter)
-    if(syn_connected == 0):
+    if(syn_connected == 0): 
         if(raw_cate == syn_cate):
             return 1
         else:

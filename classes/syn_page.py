@@ -1,9 +1,6 @@
 #modules
 import os
 import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
-from io import BytesIO
 from pathlib import Path
 import json
 
@@ -154,20 +151,6 @@ class syn_page:
         )
         col1, col2 = st.columns(2)
         col1.dataframe(st.session_state.syn_table.round(decimals = 4))
-        #그래프 생성
-        # fig, ax = plt.subplots(figsize=(4,4))
-        # means = st.session_state.syn_table.iloc[0].iat[0]
-        # mins = st.session_state.syn_table.iloc[0].iat[3]
-        # maxes = st.session_state.syn_table.iloc[0].iat[2]
-        # std = st.session_state.syn_table.iloc[0].iat[1]
-        # ax.errorbar('Table Reidentification Risk', means, yerr=std, fmt='8r', markersize=10, ecolor='tab:blue', lw=10)
-        # ax.errorbar('Table Reidentification Risk', means, yerr=[[means-mins],[maxes-means]],
-        #             fmt='_r', ecolor='tab:orange', lw=3, capsize=3)
-        # buf = BytesIO()
-        # fig.savefig(buf, format="png")
-        # show_table_risk = st.checkbox("그래프 보기", key="syn_table_graph")
-        # if show_table_risk:
-        #     col2.image(buf)
         
     #속성 재식별 위험도 탭
     def syn_attr(self):
@@ -179,21 +162,6 @@ class syn_page:
             mime='text/csv',
         )
         st.dataframe(st.session_state.syn_one_attr.round(decimals = 4))
-        #그래프 생성
-        # fig, ax = plt.subplots(figsize=(12,4))
-        # means = st.session_state.syn_one_attr['mean']
-        # mins = st.session_state.syn_one_attr['min']
-        # maxes = st.session_state.syn_one_attr['max']
-        # std = st.session_state.syn_one_attr['std']
-        # errors = pd.concat([means-mins,maxes-means], axis=1)
-        # ax.errorbar(st.session_state.syn_one_attr.index, means, yerr=std, fmt='8r', markersize=10, ecolor='tab:blue', lw=10)
-        # ax.errorbar(st.session_state.syn_one_attr.index, means, yerr=errors.T,
-        #             fmt='_r', ecolor='tab:orange', lw=3, capsize=3)
-        # buf = BytesIO()
-        # fig.savefig(buf, format="png")
-        # show_attr_risk = st.checkbox("그래프 보기", key="syn_attr_graph")
-        # if show_attr_risk:
-        #     st.image(buf)
 
     # 속성값 재식별 위험도 탭
     def syn_attr_val(self):
