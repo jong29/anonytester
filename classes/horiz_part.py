@@ -38,6 +38,7 @@ class horiz_part:
             with st.form("number of iterations"):
                 col3, col4, col5, col6 = st.columns([3,1,3,1])
                 st.session_state.div_num = col3.number_input("한번에 처리할 레코드 수", min_value=1 , value=1000, step=100, help="처리할 레코드 수는 재현데이터 기준입니다.")
+                st.session_state.checked_rows = col3.number_input("검사 완료한 재현데이터 레코드 수 입력", min_value=0, step=1)
                 chunk_submit = col3.form_submit_button("레코드 입력")
                 chunk_update = col5.empty()
 
@@ -50,23 +51,25 @@ class horiz_part:
 
 
                 if chunk_submit:
-                    if (split_raw_file is not None) and ("raw_chunk" not in st.session_state):
-                        # before was df, but now would be iterator
-                        cop_raw_file = copy.copy(split_raw_file)
-                        st.session_state.raw_chunk  = util.load_iter(split_raw_file, st.session_state.div_num)
-                        st.session_state.raw_chunk_cols = pd.read_csv(cop_raw_file, encoding='utf-8', index_col=0, nrows=0).columns.tolist()
+                    # if (split_raw_file is not None) and ("raw_chunk" not in st.session_state):
+                    #     # before was df, but now would be iterator
+                    #     cop_raw_file = copy.copy(split_raw_file)
+                    #     st.session_state.raw_chunk  = util.load_iter(split_raw_file, st.session_state.div_num)
+                    #     st.session_state.raw_chunk_cols = pd.read_csv(cop_raw_file, encoding='utf-8', index_col=0, nrows=0).columns.tolist()
 
-                    # first synthetic data upload
+                    # 재현데이터 기준으로 chunksize 별로 메모리에 올려서 처리함
                     if (split_syn_file is not None) and ("syn_chunk" not in st.session_state):
-                        st.session_state.syn_chunk = util.load_iter(split_syn_file, st.session_state.div_num)
+                        # st.session_state.syn_chunk = util.load_iter(split_syn_file, st.session_state.div_num)
+                        st.session_state.syn_chunk = pd.read_csv(split_syn_file, encoding='utf-8',skiprows=range(1,st.session_state.checked_rows+1), chunksize=st.session_state.div_num)
                         st.session_state.syn_chunk_cols = pd.read_csv(split_syn_file, encoding='utf-8', index_col=0, nrows=0).columns.tolist()
 
                     # 원본 csv의 레코드수 세기
-                    st.session_state.chunk_no = util.count_iterations(st.session_state.syn_chunk)
+                    st.session_state.record_no = util.count_iterations(split_raw_file)
                     st.experimental_rerun() # 스크립트 재실행 하여야 "반복 실행 횟수"의 else 부분 작동
                 
                 if "chunk_no" in st.session_state:
-                    st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {st.session_state.chunk_no}회 반복해야 됩니다.")
+                    # st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {st.session_state.chunk_no}회 반복해야 됩니다.")
+                    st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {st.session_state.record_no/st.session_state.div_num + 1}회 반복해야 됩니다.")
 
 
 
