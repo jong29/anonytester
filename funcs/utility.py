@@ -60,9 +60,7 @@ def to_str(drop_list):
     return ", ".join(drop_list)
 
 # 재현데이터 파일 iterable object 받아서 파일안에 chunk 개수 반환
-def count_iterations(syn_file):
-    with open(syn_file) as fp:
-        for (count, _) in enumerate(fp, 1):
-            pass
-    return count
-    
+def count_iterations(syn_file_iterator):
+    for chunk_number, _ in enumerate(syn_file_iterator):
+        print(_)
+    return chunk_number+1

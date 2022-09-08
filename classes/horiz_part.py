@@ -59,17 +59,15 @@ class horiz_part:
 
                     # 재현데이터 기준으로 chunksize 별로 메모리에 올려서 처리함
                     if (split_syn_file is not None) and ("syn_chunk" not in st.session_state):
-                        # st.session_state.syn_chunk = util.load_iter(split_syn_file, st.session_state.div_num)
+                        st.session_state.chunk4count = util.load_iter(split_syn_file, st.session_state.div_num)
                         st.session_state.syn_chunk = pd.read_csv(split_syn_file, encoding='utf-8',skiprows=range(1,st.session_state.checked_rows+1), chunksize=st.session_state.div_num)
                         st.session_state.syn_chunk_cols = pd.read_csv(split_syn_file, encoding='utf-8', index_col=0, nrows=0).columns.tolist()
-
-                    # 원본 csv의 레코드수 세기
-                    st.session_state.record_no = util.count_iterations(split_raw_file)
-                    st.experimental_rerun() # 스크립트 재실행 하여야 "반복 실행 횟수"의 else 부분 작동
+                        # 원본 csv의 레코드수 세기
+                        st.session_state.chunk_no = util.count_iterations(st.session_state.chunk4count)
+                        st.experimental_rerun() # 스크립트 재실행 하여야 "반복 실행 횟수"의 else 부분 작동
                 
                 if "chunk_no" in st.session_state:
-                    # st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {st.session_state.chunk_no}회 반복해야 됩니다.")
-                    st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {st.session_state.record_no/st.session_state.div_num + 1}회 반복해야 됩니다.")
+                    st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {st.session_state.chunk_no}회 반복해야 됩니다.")
 
 
 
@@ -91,11 +89,11 @@ class horiz_part:
                 self.progress_info()
 
     def syn_reid(self):
-        if ("raw_chunk" in st.session_state) and ("syn_chunk" in st.session_state):
+        if "syn_chunk" in st.session_state:
             with st.form("reid_calc"):
                 col2_0, col2_1, col2_2, col2_3, col2_4 = st.columns([0.3, 5, 1, 20, 1])
                 dims = col2_3.slider('재식별도 계산 Dimension을 선택',  
-                                    1, len(st.session_state.raw_chunk_cols),(1, len(st.session_state.syn_chunk_cols)))
+                                    1, len(st.session_state.syn_chunk_cols),(1, len(st.session_state.syn_chunk_cols)))
                 record_num = col2_1.number_input("재식별 확인 레코드 수", min_value=-1, step=1, help="-1을 입력하시면 전체를 확인합니다.")
 
                 start_button = col2_3.form_submit_button("재식별도 계산 시작")
