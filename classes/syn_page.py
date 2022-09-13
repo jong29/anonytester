@@ -3,6 +3,7 @@ import os
 import streamlit as st
 from pathlib import Path
 import json
+import collections
 
 #functions
 from funcs.risk_syn import compute_risk
@@ -19,7 +20,7 @@ class syn_page:
                     st.session_state.syn_single_attr, st.session_state.syn_one_attr, st.session_state.syn_record, st.session_state.syn_table \
                         = compute_risk(st.session_state.syn_data.copy())
             try:
-                if (st.session_state.raw_data.columns == st.session_state.syn_data.columns).all():
+                if collections.Counter(st.session_state.raw_data.columns.tolist()) == collections.Counter(st.session_state.syn_data.columns.tolist()):
                     pass
                 else:
                     st.warning("원본데이터와 재현데이터의 속성이 다릅니다.")
