@@ -59,11 +59,11 @@ class horiz_part:
 
                     # 재현데이터 기준으로 chunksize 별로 메모리에 올려서 처리함
                     if (split_syn_file is not None) and ("syn_chunk" not in st.session_state):
-                        st.session_state.chunk4count = util.load_iter(split_syn_file, st.session_state.div_num)
-                        st.session_state.syn_chunk = pd.read_csv(split_syn_file, encoding='utf-8',skiprows=range(1,st.session_state.checked_rows+1), chunksize=st.session_state.div_num)
-                        st.session_state.syn_chunk_cols = pd.read_csv(split_syn_file, encoding='utf-8', index_col=0, nrows=0).columns.tolist()
                         # 원본 csv의 레코드수 세기
-                        st.session_state.chunk_no = util.count_iterations(st.session_state.chunk4count)
+                        st.session_state.chunk_no = util.count_iterations(copy.deepcopy(split_syn_file), st.session_state.div_num)
+                        st.session_state.syn_chunk = pd.read_csv(copy.deepcopy(split_syn_file), encoding='utf-8',skiprows=range(1,st.session_state.checked_rows+1), chunksize=st.session_state.div_num)
+                        st.session_state.syn_chunk_cols = pd.read_csv(split_syn_file, encoding='utf-8', index_col=0, nrows=0).columns.tolist()
+                        print(st.session_state.syn_chunk_cols)
                         st.experimental_rerun() # 스크립트 재실행 하여야 "반복 실행 횟수"의 else 부분 작동
                 
                 if "chunk_no" in st.session_state:
