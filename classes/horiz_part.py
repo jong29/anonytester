@@ -69,18 +69,6 @@ class horiz_part:
                 if "chunk_no" in st.session_state:
                     st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {st.session_state.chunk_no}회 반복해야 됩니다.")
 
-
-
-        if ("split_raw_file" in st.session_state) and ("split_syn_file" in st.session_state):
-            # 원본 재현데이터 칼럼 동일한지 확인
-            try:
-                if (st.session_state.raw_data.columns == st.session_state.syn_data.columns).all():
-                    pass
-                else:
-                    st.warning("원본데이터와 재현데이터의 속성이 다릅니다.")
-            except:
-                st.warning("원본데이터와 재현데이터의 속성이 다릅니다.")
-
         if self.chunk_submit2:
             tab1, tab2 = st.tabs(["재식별도", "진행정보"])
             with tab1:
