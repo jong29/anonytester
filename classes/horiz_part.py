@@ -28,10 +28,6 @@ class horiz_part:
         col2.markdown("#### 재현데이터")
         split_syn_file = col2.file_uploader("재현데이터 업로드", type="csv")
 
-        if "repeat_num" not in st.session_state:
-            self.chunk_submit2 = False
-        else:
-            self.chunk_submit2 = True
 
         # 분할처리 위한 기타 파라미터 입력
         if (split_raw_file is not None) and (split_syn_file is not None):
@@ -47,29 +43,20 @@ class horiz_part:
                     chunk_update.number_input("반복 실행 횟수", min_value=1, max_value=1, key="tmp_iter")
                 else:
                     st.session_state.repeat_num = chunk_update.number_input("반복 실행 횟수", min_value=1, max_value=st.session_state.chunk_no, step=1)
-                    self.chunk_submit2 = col5.form_submit_button("반복 횟수 입력")
 
 
                 if chunk_submit:
-                    # if (split_raw_file is not None) and ("raw_chunk" not in st.session_state):
-                    #     # before was df, but now would be iterator
-                    #     cop_raw_file = copy.copy(split_raw_file)
-                    #     st.session_state.raw_chunk  = util.load_iter(split_raw_file, st.session_state.div_num)
-                    #     st.session_state.raw_chunk_cols = pd.read_csv(cop_raw_file, encoding='utf-8', index_col=0, nrows=0).columns.tolist()
-
                     # 재현데이터 기준으로 chunksize 별로 메모리에 올려서 처리함
                     if (split_syn_file is not None) and ("syn_chunk" not in st.session_state):
                         # 원본 csv의 레코드수 세기
                         st.session_state.chunk_no = util.count_iterations(copy.deepcopy(split_syn_file), st.session_state.div_num)
                         st.session_state.syn_chunk = pd.read_csv(copy.deepcopy(split_syn_file), encoding='utf-8',skiprows=range(1,st.session_state.checked_rows+1), chunksize=st.session_state.div_num)
                         st.session_state.syn_chunk_cols = pd.read_csv(split_syn_file, encoding='utf-8', index_col=0, nrows=0).columns.tolist()
-                        print(st.session_state.syn_chunk_cols)
                         st.experimental_rerun() # 스크립트 재실행 하여야 "반복 실행 횟수"의 else 부분 작동
                 
                 if "chunk_no" in st.session_state:
                     st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {st.session_state.chunk_no}회 반복해야 됩니다.")
-
-        if self.chunk_submit2:
+        if "repeat_num" in st.session_state:
             tab1, tab2 = st.tabs(["재식별도", "진행정보"])
             with tab1:
                 self.syn_reid()
@@ -99,16 +86,19 @@ class horiz_part:
                     st.write(raw_df)
                     
                     # 재식별 위험도
-                    _, _, _, st.session_state.syn_table = compute_risk(st.session_state.syn_df.copy())
-                    st.write(st.session_state.syn_table)
+                    # _, _, _, st.session_state.syn_table = compute_risk(st.session_state.syn_df.copy())
+                    # st.write("재식별 위험도")
+                    # st.write(st.session_state.syn_table)
 
                     # 유사도
                     _, _, _, st.session_state.table_similarity = similarity(st.session_state.raw_df, st.session_state.syn_df, apply_hierarchy=False)
+                    st.write("유사도")
                     st.write(st.session_state.table_similarity)
 
                     # 재식별도
                     st.session_state.syn_reidentified, st.session_state.dropped_cols_syn = syn_reidentified_datas(\
                         st.session_state.raw_df, st.session_state.syn_df, K=record_num, start_dim=dims[0], end_dim=dims[1])
+                    st.write("재식별도")
                     st.write(st.session_state.syn_reidentified)
 
                     stop = timeit.default_timer()
