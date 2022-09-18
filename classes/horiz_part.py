@@ -14,6 +14,7 @@ from funcs.synthetic_reidentified import syn_reidentified_datas
 from funcs.similarity import similarity
 import funcs.utility as util
 import funcs.preprocessing as prep
+import funcs.horiz_util as horiz
 
 import timeit
 class horiz_part:
@@ -75,34 +76,14 @@ class horiz_part:
             
             reidentified_res = st.container()
             if start_button:
-                start = timeit.default_timer()
-
+                
+                ctr = 0
                 #재식별 위험도  
                 for chunk in st.session_state.syn_chunk:
                     # 전처리
-                    syn_df = prep.preprocessing_syn(chunk)
-                    st.write(syn_df)
-                    raw_df = prep.preprocessing_raw(chunk)
-                    st.write(raw_df)
-                    
-                    # 재식별 위험도
-                    # _, _, _, st.session_state.syn_table = compute_risk(st.session_state.syn_df.copy())
-                    # st.write("재식별 위험도")
-                    # st.write(st.session_state.syn_table)
-
-                    # 유사도
-                    _, _, _, st.session_state.table_similarity = similarity(st.session_state.raw_df, st.session_state.syn_df, apply_hierarchy=False)
-                    st.write("유사도")
-                    st.write(st.session_state.table_similarity)
-
-                    # 재식별도
-                    st.session_state.syn_reidentified, st.session_state.dropped_cols_syn = syn_reidentified_datas(\
-                        st.session_state.raw_df, st.session_state.syn_df, K=record_num, start_dim=dims[0], end_dim=dims[1])
-                    st.write("재식별도")
-                    st.write(st.session_state.syn_reidentified)
-
-                    stop = timeit.default_timer()
-                    reidentified_res.write(f"계산 시간: {stop-start}")
+                    if ctr == 2:
+                        horiz.process_chunk(chunk)
+                        ctr += 1
 
             '''
             # 재식별 데이터 저장 디렉토리 강제 생성
