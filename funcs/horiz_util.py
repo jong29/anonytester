@@ -1,7 +1,8 @@
 import pandas as pd
-import preprocessing
-import risk_syn
-import synthetic_reidentified
+import funcs.preprocessing as preprocessing
+import funcs.risk_syn as risk_syn
+import funcs.synthetic_reidentified as synthetic_reidentified
+import funcs.similarity as similarity
 
 def process_chunk(chunk):
     chunk = chunk.drop('an_usr_no', axis=1)
@@ -15,11 +16,11 @@ def process_chunk(chunk):
     raw_chunk = raw_chunk.drop('USR_NO', axis=1)
     prep_raw = preprocessing.preprocessing_raw(raw_chunk)
     
-#     print("Raw")
-#     print(prep_raw)
+    print("Raw")
+    print(prep_raw)
     
-#     print("Synthetic")
-#     print(prep_syn)
+    print("Synthetic")
+    print(prep_syn)
     
     
     # 재식별 위험도
@@ -28,9 +29,9 @@ def process_chunk(chunk):
     print(syn_table)
     
 #     # 유사도
-#     _, _, _, table_similarity = similarity.similarity(prep_raw, prep_syn, apply_hierarchy=False)
-#     print("유사도")
-#     print(table_similarity)
+    _, _, _, table_similarity = similarity.similarity(prep_raw, prep_syn, apply_hierarchy=False)
+    print("유사도")
+    print(table_similarity)
     
 #     # 재식별도
     syn_reidentified, _ = synthetic_reidentified.syn_reidentified_datas(\

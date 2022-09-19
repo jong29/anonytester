@@ -82,8 +82,9 @@ class horiz_part:
                 for chunk in st.session_state.syn_chunk:
                     # 전처리
                     if ctr == 2:
-                        horiz.process_chunk(chunk)
-                        ctr += 1
+                        break
+                    horiz.process_chunk(chunk)
+                    ctr += 1
 
             '''
             # 재식별 데이터 저장 디렉토리 강제 생성
