@@ -19,6 +19,15 @@ def preprocessing_raw(raw_data):
     raw_data.columns = raw_data.columns.str.lower()
     return raw_data
 
+@st.cache(show_spinner=False, suppress_st_warning=True)
+# 원본 수평분할 전처리
+def preprocessing_raw_horiz(raw_data, start_idx):
+    raw_data = raw_data.reset_index().rename(columns={'index':'abst_row_num__'})
+    raw_data['abst_row_num__'] = raw_data['abst_row_num__'] + start_idx
+    raw_data = raw_data.set_index("abst_row_num__")
+    raw_data.columns = raw_data.columns.str.lower()
+    return raw_data
+
 #====================================재현 전처리=============================
 @st.cache(show_spinner=False, suppress_st_warning=True)
 def preprocessing_syn(syn_data):

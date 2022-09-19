@@ -4,23 +4,27 @@ import funcs.risk_syn as risk_syn
 import funcs.synthetic_reidentified as synthetic_reidentified
 import funcs.similarity as similarity
 
-def process_chunk(chunk):
-    chunk = chunk.drop('an_usr_no', axis=1)
+import streamlit as st
+
+def process_chunk(chunk, raw_file):
+    # chunk = chunk.drop('an_usr_no', axis=1)
     prep_syn= preprocessing.preprocessing_syn(chunk)
     start = prep_syn.index[0]
     end = prep_syn.index[-1]
     print(f"start: {start}")
     print(f"end: {end}")
     
-    raw_chunk = pd.read_csv("z_ptdrctor_wrtng_debug.csv", encoding='utf-8', skiprows=range(1,start-1), nrows =end-start)
-    raw_chunk = raw_chunk.drop('USR_NO', axis=1)
-    prep_raw = preprocessing.preprocessing_raw(raw_chunk)
+    raw_chunk = pd.read_csv(raw_file, encoding='utf-8', skiprows=range(1,start-1), nrows =end-start)
+    # raw_chunk = raw_chunk.drop('USR_NO', axis=1)
+    prep_raw = preprocessing.preprocessing_raw_horiz(raw_chunk, start)
     
-    print("Raw")
-    print(prep_raw)
+    st.write(f"start: {start}, end: {end}")
+
+    st.write("Raw")
+    st.write(prep_raw)
     
-    print("Synthetic")
-    print(prep_syn)
+    st.write("Synthetic")
+    st.write(prep_syn)
     
     
     # 재식별 위험도

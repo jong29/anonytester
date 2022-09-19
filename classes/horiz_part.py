@@ -60,11 +60,11 @@ class horiz_part:
         if "repeat_num" in st.session_state:
             tab1, tab2 = st.tabs(["재식별도", "진행정보"])
             with tab1:
-                self.syn_reid()
+                self.syn_reid(split_raw_file)
             with tab2:
                 self.progress_info()
 
-    def syn_reid(self):
+    def syn_reid(self, raw_file):
         if "syn_chunk" in st.session_state:
             with st.form("reid_calc"):
                 col2_0, col2_1, col2_2, col2_3, col2_4 = st.columns([0.3, 5, 1, 20, 1])
@@ -76,14 +76,12 @@ class horiz_part:
             
             reidentified_res = st.container()
             if start_button:
-                
                 ctr = 0
-                #재식별 위험도  
                 for chunk in st.session_state.syn_chunk:
                     # 전처리
                     if ctr == 2:
                         break
-                    horiz.process_chunk(chunk)
+                    horiz.process_chunk(chunk, raw_file)
                     ctr += 1
 
             '''
