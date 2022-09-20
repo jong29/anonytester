@@ -12,16 +12,16 @@ def process_chunk(chunk, raw_file, dims, record_num):
     start = prep_syn.index[0]
     end = prep_syn.index[-1]
     
-    raw_chunk = pd.read_csv(raw_file, encoding='utf-8', skiprows=range(1,start-1), nrows=end-start)
+    raw_chunk = pd.read_csv(raw_file, encoding='utf-8', skiprows=range(1,start), nrows=end-start)
     # raw_chunk = raw_chunk.drop('USR_NO', axis=1)
     prep_raw = preprocessing.preprocessing_raw_horiz(raw_chunk, start)
     
     # debugging
     st.write(f"start: {start}, end: {end}")
-    # st.write("Raw")
-    # st.write(prep_raw)
-    # st.write("Synthetic")
-    # st.write(prep_syn)
+    st.write("Raw")
+    st.write(prep_raw)
+    st.write("Synthetic")
+    st.write(prep_syn)
     
 #     # 재식별도
     syn_reidentified, _ = synthetic_reidentified.syn_reidentified_datas(\
