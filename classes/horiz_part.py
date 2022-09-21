@@ -76,14 +76,14 @@ class horiz_part:
             
             reidentified_res = st.container()
             if start_button:
-                # ctr = 0
+                ctr = 0
                 for chunk in st.session_state.syn_chunk:
                 #     # 전처리
-                #     if ctr == 2:
-                #         break
+                    if ctr == 2:
+                        break
                     horiz.process_chunk(chunk, raw_file, dims, record_num)
-                    break
-                #     ctr += 1
+                    # break
+                    ctr += 1
 
             '''
             # 재식별 데이터 저장 디렉토리 강제 생성

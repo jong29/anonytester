@@ -5,6 +5,7 @@ import funcs.synthetic_reidentified as synthetic_reidentified
 import funcs.similarity as similarity
 
 import streamlit as st
+import copy
 
 def process_chunk(chunk, raw_file, dims, record_num):
     # chunk = chunk.drop('an_usr_no', axis=1)
@@ -14,7 +15,7 @@ def process_chunk(chunk, raw_file, dims, record_num):
     end = prep_syn.index[-1]
 
 
-    raw_chunk = pd.read_csv(raw_file, encoding='utf-8', skiprows=range(1,start), nrows=end-start)
+    raw_chunk = pd.read_csv(copy.deepcopy(raw_file), encoding='utf-8', skiprows=range(1,start), nrows=end-start)
     # raw_chunk = raw_chunk.drop('USR_NO', axis=1)
     prep_raw = preprocessing.preprocessing_raw_horiz(raw_chunk, start)
     
