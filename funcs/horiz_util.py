@@ -8,10 +8,12 @@ import streamlit as st
 
 def process_chunk(chunk, raw_file, dims, record_num):
     # chunk = chunk.drop('an_usr_no', axis=1)
+    # chunk = pd.read_csv(syn_file, encoding='utf-8',skiprows=range(1,st.session_state.checked_rows+1), chunksize=st.session_state.div_num)
     prep_syn= preprocessing.preprocessing_syn(chunk)
     start = prep_syn.index[0]
     end = prep_syn.index[-1]
-    
+
+
     raw_chunk = pd.read_csv(raw_file, encoding='utf-8', skiprows=range(1,start), nrows=end-start)
     # raw_chunk = raw_chunk.drop('USR_NO', axis=1)
     prep_raw = preprocessing.preprocessing_raw_horiz(raw_chunk, start)
