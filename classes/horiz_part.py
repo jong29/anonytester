@@ -53,6 +53,7 @@ class horiz_part:
                         st.session_state.chunk_no = util.count_iterations(copy.deepcopy(split_syn_file), st.session_state.div_num)
                         st.session_state.syn_chunk = pd.read_csv(copy.deepcopy(split_syn_file), encoding='utf-8',skiprows=range(1,st.session_state.checked_rows+1), chunksize=st.session_state.div_num)
                         st.session_state.syn_chunk_cols = pd.read_csv(copy.deepcopy(split_syn_file), encoding='utf-8', index_col=0, nrows=0).columns.tolist()
+                        # should run a garabge collection here as well
                         st.experimental_rerun() # 스크립트 재실행 하여야 "반복 실행 횟수"의 else 부분 작동
                 
                 if "chunk_no" in st.session_state:
@@ -74,22 +75,23 @@ class horiz_part:
 
                 start_button = col2_3.form_submit_button("재식별도 계산 시작")
             
-            reidentified_res = st.container()
-            if start_button:
-                ctr = 0
-                for chunk in st.session_state.syn_chunk:
-                #     # 전처리
-                    if ctr == 2:
-                        break
-                    horiz.process_chunk(chunk, raw_file, dims, record_num)
-                    # break
-                    ctr += 1
-
-            '''
             # 재식별 데이터 저장 디렉토리 강제 생성
             default_dir_path = str(Path.home()) + "/Desktop/Anonytest/"
-            synfile_dir_path = default_dir_path + st.session_state.syn_file_name[:-4]
+            synfile_dir_path = default_dir_path + str(st.session_state.split_syn_file.name)[:-4]
             self.create_dirs(default_dir_path, synfile_dir_path)
+            
+            reidentified_res = st.container()
+            if start_button:
+                loop_count = 0
+                #chunk 자체를 for loop 돌려야 chunk 별로 읽어짐
+                for chunk in st.session_state.syn_chunk:
+                    if loop_count == 2:
+                        break
+                    reid_chunk, risk_chunk, sim_chunk = horiz.process_chunk(chunk, raw_file, dims, record_num)
+                    loop_count += 1
+
+
+            '''
 
             # metadata 파일 처리
             # metadata json 형태로 담을 dictionary
