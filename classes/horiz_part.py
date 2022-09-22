@@ -36,14 +36,9 @@ class horiz_part:
                 col3, col4, col5, col6 = st.columns([3,1,3,1])
                 st.session_state.div_num = col3.number_input("한번에 처리할 레코드 수", min_value=1 , value=1000, step=100, help="처리할 레코드 수는 재현데이터 기준입니다.")
                 st.session_state.checked_rows = col3.number_input("검사 완료한 재현데이터 레코드 수 입력", min_value=0, step=1)
-                chunk_submit = col3.form_submit_button("레코드 입력")
-                chunk_update = col5.empty()
+                chunk_submit = col3.form_submit_button("입력")
+                st.caption("숫자 변경하면 입력 버튼 눌러주세요")
 
-                # initial state of chunk_no for iteration number input
-                if "chunk_no" not in st.session_state:
-                    chunk_update.number_input("반복 실행 횟수", min_value=1, max_value=1, key="tmp_iter")
-                else:
-                    st.session_state.repeat_num = chunk_update.number_input("반복 실행 횟수", min_value=1, max_value=st.session_state.chunk_no, step=1)
 
 
                 if chunk_submit:
@@ -58,6 +53,18 @@ class horiz_part:
                 
                 if "chunk_no" in st.session_state:
                     st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {st.session_state.chunk_no}회 반복해야 됩니다.")
+                
+                # if "chunk_no" in st.session_state:
+                    st.session_state.repeat_num = col5.number_input("반복 실행 횟수", min_value=1, max_value=st.session_state.chunk_no, step=1)
+                    st.write(f'검사완료 횟수: {st.session_state.checked_rows} | 반복횟수: {st.session_state.repeat_num}')
+
+                # 재식별 데이터 저장 디렉토리 강제 생성
+                default_dir_path = str(Path.home()) + "/Desktop/Anonytest/"
+                synfile_dir_path = default_dir_path + str(split_syn_file.name)[:-4]
+                self.create_dirs(default_dir_path, synfile_dir_path)
+                # input_preview = st.empty()
+
+
         if "repeat_num" in st.session_state:
             tab1, tab2 = st.tabs(["재식별도", "진행정보"])
             with tab1:
@@ -75,17 +82,13 @@ class horiz_part:
 
                 start_button = col2_3.form_submit_button("재식별도 계산 시작")
             
-            # 재식별 데이터 저장 디렉토리 강제 생성
-            default_dir_path = str(Path.home()) + "/Desktop/Anonytest/"
-            synfile_dir_path = default_dir_path + str(st.session_state.split_syn_file.name)[:-4]
-            self.create_dirs(default_dir_path, synfile_dir_path)
             
             reidentified_res = st.container()
             if start_button:
                 loop_count = 0
                 #chunk 자체를 for loop 돌려야 chunk 별로 읽어짐
                 for chunk in st.session_state.syn_chunk:
-                    if loop_count == 2:
+                    if loop_count == st.session_state.repeat_num:
                         break
                     reid_chunk, risk_chunk, sim_chunk = horiz.process_chunk(chunk, raw_file, dims, record_num)
                     loop_count += 1

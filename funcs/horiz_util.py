@@ -28,17 +28,20 @@ def process_chunk(chunk, raw_file, dims, record_num):
     #lets do one garbage collection here
 
     # debugging
-    # st.write(f"start: {start}, end: {end}")
-    # st.write("Raw")
-    # st.write(prep_raw)
-    # st.write("Synthetic")
-    # st.write(prep_syn)
+    st.write(f"start: {start}, end: {end}")
+    st.write("Raw")
+    st.write(prep_raw)
+    st.write("Synthetic")
+    st.write(prep_syn)
 
     # st.write("위험도")
     # st.write(syn_table)
 
     # st.write("유사도")
     # st.write(table_similarity)
+
+    st.write("재식별 레코드수")
+    st.write(len(syn_reidentified))
 
     # st.write("재식별 레코드")
     # st.write(syn_reidentified)
