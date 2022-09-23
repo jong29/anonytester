@@ -36,27 +36,27 @@ class horiz_part:
                 col3, col4, col5, col6 = st.columns([3,1,3,1])
                 st.session_state.div_num = col3.number_input("한번에 처리할 레코드 수", min_value=1 , value=1000, step=100, help="처리할 레코드 수는 재현데이터 기준입니다.")
                 st.session_state.checked_rows = col3.number_input("검사 완료한 재현데이터 레코드 수 입력", min_value=0, step=1)
+                if "chunk_no" in st.session_state:
+                    st.session_state.repeat_num = col5.number_input("반복 실행 횟수", min_value=1, max_value=st.session_state.chunk_no, step=1)
                 chunk_submit = col3.form_submit_button("입력")
                 st.caption("숫자 변경하면 입력 버튼 눌러주세요")
 
-
-
-                if chunk_submit:
-                    # 재현데이터 기준으로 chunksize 별로 메모리에 올려서 처리함
-                    if (split_syn_file is not None) and ("chunk_no" not in st.session_state):
-                        # 원본 csv의 레코드수 세기
-                        st.session_state.chunk_no = util.count_iterations(copy.deepcopy(split_syn_file), st.session_state.div_num)
-                        st.session_state.syn_chunk = pd.read_csv(copy.deepcopy(split_syn_file), encoding='utf-8',skiprows=range(1,st.session_state.checked_rows+1), chunksize=st.session_state.div_num)
-                        st.session_state.syn_chunk_cols = pd.read_csv(copy.deepcopy(split_syn_file), encoding='utf-8', index_col=0, nrows=0).columns.tolist()
-                        # should run a garabge collection here as well
-                        st.experimental_rerun() # 스크립트 재실행 하여야 "반복 실행 횟수"의 else 부분 작동
-                
                 if "chunk_no" in st.session_state:
                     st.write(f"한번에 {st.session_state.div_num}의 레코드를 처리하면 {st.session_state.chunk_no}회 반복해야 됩니다.")
+                    st.write(f'검사완료 레코드 수: {st.session_state.checked_rows} | 반복횟수: {st.session_state.repeat_num}')
+
+                if chunk_submit:
+                    # 전체 반복 횟수
+                    st.session_state.chunk_no = util.count_iterations(copy.deepcopy(split_syn_file), st.session_state.div_num)
+                    # 청크로 읽은 재현데이터
+                    st.session_state.syn_chunk = pd.read_csv(copy.deepcopy(split_syn_file), encoding='utf-8',skiprows=range(1,st.session_state.checked_rows+1), chunksize=st.session_state.div_num)
+                    # 재현데이터 속성 읽기
+                    st.session_state.chunk_col_num = pd.read_csv(copy.deepcopy(split_raw_file), encoding='utf-8', index_col=0, nrows=0).reset_index().columns.tolist()
+                    # should run a garabge collection here as well
+                    # if "chunk_no" in st.session_state:
+                        
+                    st.experimental_rerun() # 스크립트 재실행 하여야 "반복 실행 횟수"의 else 부분 작동
                 
-                # if "chunk_no" in st.session_state:
-                    st.session_state.repeat_num = col5.number_input("반복 실행 횟수", min_value=1, max_value=st.session_state.chunk_no, step=1)
-                    st.write(f'검사완료 횟수: {st.session_state.checked_rows} | 반복횟수: {st.session_state.repeat_num}')
 
                 # 재식별 데이터 저장 디렉토리 강제 생성
                 default_dir_path = str(Path.home()) + "/Desktop/Anonytest/"
@@ -77,7 +77,7 @@ class horiz_part:
             with st.form("reid_calc"):
                 col2_0, col2_1, col2_2, col2_3, col2_4 = st.columns([0.3, 5, 1, 20, 1])
                 dims = col2_3.slider('재식별도 계산 Dimension을 선택',  
-                                    1, len(st.session_state.syn_chunk_cols),(1, len(st.session_state.syn_chunk_cols)))
+                                    1, len(st.session_state.chunk_col_num),(1, len(st.session_state.chunk_col_num)))
                 record_num = col2_1.number_input("재식별 확인 레코드 수", min_value=-1, step=1, help="-1을 입력하시면 전체를 확인합니다.")
 
                 start_button = col2_3.form_submit_button("재식별도 계산 시작")
@@ -86,11 +86,16 @@ class horiz_part:
             reidentified_res = st.container()
             if start_button:
                 loop_count = 0
+                reid_collection = pd.DataFrame(columns=st.session_state.chunk_col_num)
+                other_collection = ""
+                
                 #chunk 자체를 for loop 돌려야 chunk 별로 읽어짐
                 for chunk in st.session_state.syn_chunk:
                     if loop_count == st.session_state.repeat_num:
                         break
-                    reid_chunk, risk_chunk, sim_chunk = horiz.process_chunk(chunk, raw_file, dims, record_num)
+                    reid_chunk, risk_chunk, sim_chunk, start_index, end_index = horiz.process_chunk(chunk, raw_file, dims, record_num)
+                    chunk_metadata = (loop_count, start_index, end_index, st.session_state.div_num, len(reid_chunk), risk_chunk.iloc[0,0], sim_chunk.iloc[0,0])
+                    reid_collection, other_collection = horiz.collect_chunk(reid_collection, other_collection, reid_chunk, chunk_metadata)
                     loop_count += 1
 
 

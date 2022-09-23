@@ -49,7 +49,6 @@ def count_iterations(file, records):
 
     for chunk_number, _ in enumerate(df):
         pass
-    print(chunk_number)
     return chunk_number+1
 
 # 일반 재현

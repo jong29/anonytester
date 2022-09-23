@@ -1,3 +1,4 @@
+import chunk
 import pandas as pd
 import funcs.preprocessing as preprocessing
 import funcs.risk_syn as risk_syn
@@ -29,21 +30,31 @@ def process_chunk(chunk, raw_file, dims, record_num):
 
     # debugging
     st.write(f"start: {start}, end: {end}")
-    st.write("Raw")
-    st.write(prep_raw)
-    st.write("Synthetic")
-    st.write(prep_syn)
+    # st.write("Raw")
+    # st.write(prep_raw)
+    # st.write("Synthetic")
+    # st.write(prep_syn)
 
-    # st.write("위험도")
-    # st.write(syn_table)
+    st.write("위험도")
+    st.write(syn_table)
 
-    # st.write("유사도")
-    # st.write(table_similarity)
+    st.write("유사도")
+    st.write(table_similarity)
 
     st.write("재식별 레코드수")
     st.write(len(syn_reidentified))
 
-    # st.write("재식별 레코드")
-    # st.write(syn_reidentified)
+    st.write("재식별 레코드")
+    st.write(syn_reidentified)
     
-    return syn_reidentified, syn_table, table_similarity
+    return syn_reidentified, syn_table, table_similarity, start, end
+
+def collect_chunk(reid_collection, other_collection, reid_chunk, chunk_metadata):
+    reid_collection = pd.concat([reid_collection, reid_chunk], ignore_index=True)
+    other_collection += f"""회차: {chunk_metadata[0]}, 시작행: {chunk_metadata[1]}, 끝행: {chunk_metadata[2]}, 전체 레코드수: {chunk_metadata[3]},
+                        재식별 레코드수: {chunk_metadata[4]}, 재식별 위험도: {chunk_metadata[5]}, 유사도: {chunk_metadata[6]}"""
+
+    print(reid_collection)
+    print(other_collection)
+
+    return reid_collection, other_collection
