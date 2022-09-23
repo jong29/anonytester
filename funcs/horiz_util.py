@@ -16,45 +16,41 @@ def process_chunk(chunk, raw_file, dims, record_num):
     raw_chunk = pd.read_csv(copy.deepcopy(raw_file), encoding='utf-8', skiprows=range(1,start), nrows=end-start)
     prep_raw = preprocessing.preprocessing_raw_horiz(raw_chunk, start)
     
-#     # 재식별도
+    # 재식별도
     syn_reidentified, _ = synthetic_reidentified.syn_reidentified_datas(\
         prep_raw.copy(), prep_syn.copy(), K=record_num, start_dim=dims[0], end_dim=dims[1])
     
     # 재식별 위험도
     _, _, _, syn_table = risk_syn.compute_risk(prep_syn.copy())
     
-#     # 유사도
+    # 유사도
     _, _, _, table_similarity = similarity.similarity(prep_raw.copy(), prep_syn.copy(), apply_hierarchy=False)
 
     #lets do one garbage collection here
 
     # debugging
-    st.write(f"start: {start}, end: {end}")
+    # st.write(f"start: {start}, end: {end}")
     # st.write("Raw")
     # st.write(prep_raw)
     # st.write("Synthetic")
     # st.write(prep_syn)
 
-    st.write("위험도")
-    st.write(syn_table)
+    # st.write("위험도")
+    # st.write(syn_table)
 
-    st.write("유사도")
-    st.write(table_similarity)
+    # st.write("유사도")
+    # st.write(table_similarity)
 
-    st.write("재식별 레코드수")
-    st.write(len(syn_reidentified))
+    # st.write("재식별 레코드수")
+    # st.write(len(syn_reidentified))
 
-    st.write("재식별 레코드")
-    st.write(syn_reidentified)
+    # st.write("재식별 레코드")
+    # st.write(syn_reidentified)
     
-    return syn_reidentified, syn_table, table_similarity, start, end
+    return syn_reidentified, syn_table, table_similarity
 
 def collect_chunk(reid_collection, other_collection, reid_chunk, chunk_metadata):
     reid_collection = pd.concat([reid_collection, reid_chunk], ignore_index=True)
-    other_collection += f"""회차: {chunk_metadata[0]}, 시작행: {chunk_metadata[1]}, 끝행: {chunk_metadata[2]}, 전체 레코드수: {chunk_metadata[3]},
-                        재식별 레코드수: {chunk_metadata[4]}, 재식별 위험도: {chunk_metadata[5]}, 유사도: {chunk_metadata[6]}"""
-
-    print(reid_collection)
-    print(other_collection)
+    other_collection += f"회차: {chunk_metadata[0]}, 시작행: {chunk_metadata[1]}, 끝행: {chunk_metadata[2]}, 전체 레코드수: {chunk_metadata[3]}, 재식별 레코드수: {chunk_metadata[4]}, 재식별도: {chunk_metadata[4]/chunk_metadata[3]}, 재식별 위험도: {chunk_metadata[5]}, 유사도: {chunk_metadata[6]}\n"
 
     return reid_collection, other_collection

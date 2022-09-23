@@ -88,14 +88,18 @@ class horiz_part:
                 loop_count = 0
                 reid_collection = pd.DataFrame(columns=st.session_state.chunk_col_num)
                 other_collection = ""
+                start_index = st.session_state.checked_rows+1
+                end_index = st.session_state.checked_rows+st.session_state.div_num
                 
                 #chunk 자체를 for loop 돌려야 chunk 별로 읽어짐
                 for chunk in st.session_state.syn_chunk:
                     if loop_count == st.session_state.repeat_num:
                         break
-                    reid_chunk, risk_chunk, sim_chunk, start_index, end_index = horiz.process_chunk(chunk, raw_file, dims, record_num)
+                    reid_chunk, risk_chunk, sim_chunk, = horiz.process_chunk(chunk, raw_file, dims, record_num)
                     chunk_metadata = (loop_count, start_index, end_index, st.session_state.div_num, len(reid_chunk), risk_chunk.iloc[0,0], sim_chunk.iloc[0,0])
                     reid_collection, other_collection = horiz.collect_chunk(reid_collection, other_collection, reid_chunk, chunk_metadata)
+                    start_index = end_index+1
+                    end_index = end_index + st.session_state.div_num
                     loop_count += 1
 
 
