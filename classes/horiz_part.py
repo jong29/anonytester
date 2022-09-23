@@ -60,8 +60,9 @@ class horiz_part:
 
                 # 재식별 데이터 저장 디렉토리 강제 생성
                 default_dir_path = str(Path.home()) + "/Desktop/Anonytest/"
-                synfile_dir_path = default_dir_path + str(split_syn_file.name)[:-4]
-                self.create_dirs(default_dir_path, synfile_dir_path)
+                self.synfile_dir_path = default_dir_path + str(split_syn_file.name)[:-4]
+                self.synfilename = str(split_syn_file.name)[:-4]
+                self.create_dirs(default_dir_path, self.synfile_dir_path)
                 # input_preview = st.empty()
 
 
@@ -102,81 +103,20 @@ class horiz_part:
                     end_index = end_index + st.session_state.div_num
                     loop_count += 1
 
+                # 기타 정보 취합 파일 생성
+                info_file_path = self.synfile_dir_path + f'/p_info_{loop_count}.txt'
+                with open(info_file_path,'w',encoding = 'utf-8') as f:
+                    f.write(other_collection)
 
-            '''
+                # 재식별 데이터 csv파일 자동 생성
+                reid_file_path = self.synfile_dir_path + '/p_' + self.synfilename + '_' + str(loop_count) + '.csv'
+                if reid_collection.empty:
+                    st.info(f"재식별된 레코드가 없습니다!")
+                elif not os.path.exists(reid_file_path):
+                    with open(reid_file_path, 'w', encoding='utf-8-sig', newline='') as f:
+                        reid_collection.to_csv(f)
+                        st.info(f"재식별도 파일 다운로드 완료!  \n   {reid_file_path}")
 
-            # metadata 파일 처리
-            # metadata json 형태로 담을 dictionary
-            reid_record_num = len(st.session_state.syn_reidentified)
-            reid_rate = reid_record_num/len(st.session_state.syn_data)
-            meta_dict = {
-                "dims_remaining": [],
-                "files_to_combine": [],
-                "reid_record": None,
-                "reid_rate": None,
-                "raw_data_attr_num" : None,
-                "raw_data_record_num": None,
-            }
-
-            json_file_path = synfile_dir_path + '/metadata.json'
-            
-            # json 메타데이터 업데이트 재식별도 계산 시
-            if os.path.exists(json_file_path): # 메타데이터 파일 업데이트
-                with open(json_file_path, 'r', encoding = 'utf-8') as f:
-                    meta_dict = json.load(f)
-                if dims[1] == len(st.session_state.raw_data.columns):
-                    meta_dict["dims_remaining"][0] = -1  # 디멘션 전부 확인했을때 -1로 표시
-                else:
-                    if meta_dict["dims_remaining"][0] != -1:
-                        meta_dict["dims_remaining"][0] = dims[1]+1
-                if reid_record_num > meta_dict["reid_record"]: meta_dict["reid_record"] = (reid_record_num)
-                if reid_rate > meta_dict["reid_rate"]: meta_dict["reid_rate"] = (reid_rate)
-                meta_dict["files_to_combine"].append(str(dims[0]) + '_' + str(dims[1]))
-                with open(json_file_path,'w',encoding = 'utf-8') as f:
-                    f.write(json.dumps(meta_dict, indent=4))
-            else: # 메타데이터 파일 생성
-                if dims[1] == len(st.session_state.raw_data.columns):
-                    meta_dict["dims_remaining"] = [-1, -1]  # 디멘션 전부 확인했을때 -1로 표시
-                else:
-                    meta_dict["dims_remaining"] = [dims[1]+1, len(st.session_state.raw_data.columns)]
-                meta_dict["reid_record"] = reid_record_num
-                meta_dict["reid_rate"] = reid_rate
-                meta_dict["raw_data_attr_num"] = len(st.session_state.raw_data.columns)
-                meta_dict["raw_data_record_num"] = len(st.session_state.raw_data)
-                meta_dict["files_to_combine"].append(str(dims[0]) + '_' + str(dims[1]))
-                with open(json_file_path,'w',encoding = 'utf-8') as f:
-                    f.write(json.dumps(meta_dict, indent=4))
- 
-            # 재식별 데이터 csv파일 자동 생성
-            reid_file_path = synfile_dir_path + '/' + st.session_state.syn_file_name[:-4] + '_재식별데이터_' + str(dims[0]) + '_' + str(dims[1]) + '.csv'
-            if st.session_state.syn_reidentified.empty:
-                st.info(f"재식별된 레코드가 없습니다!")
-            elif not os.path.exists(reid_file_path):
-                with open(reid_file_path, 'w', encoding='utf-8-sig', newline='') as f:
-                    st.session_state.syn_reidentified.to_csv(f)
-                    st.info(f"재식별도 파일 다운로드 완료!  \n   {reid_file_path}")
-        
-        # 재식별도 관련 정보 표시
-        if "syn_reidentified" in st.session_state:
-            reid_record_num = len(st.session_state.syn_reidentified)
-            reid_rate = reid_record_num/len(st.session_state.syn_data)
-            reidentified_res.subheader(f"재식별도: {reid_rate:.2f}")
-            reidentified_res.subheader(f"재식별된 레코드 수: {len(st.session_state.syn_reidentified)}")
-
-            if not st.session_state.syn_reidentified.empty:
-                with reidentified_res.expander("재식별된 레코드 확인"):
-                    st.dataframe(st.session_state.syn_reidentified[:1000])
-            
-            # column 전체가 같은 값을 가져서 drop되면 표시
-            if st.session_state.dropped_cols_syn:
-                drop_str = "모두 같은 값을 가져 drop된 속성: "
-                for i in range(len(st.session_state.dropped_cols_syn)):
-                    if i != 0:
-                        drop_str += ", "
-                    drop_str += str(st.session_state.dropped_cols_syn[i])
-                st.markdown("##### " + drop_str)
-            st.session_state.syn_reid_done = True
-            '''
             
     def progress_info(self):
         pass

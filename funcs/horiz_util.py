@@ -1,4 +1,3 @@
-import chunk
 import pandas as pd
 import funcs.preprocessing as preprocessing
 import funcs.risk_syn as risk_syn
