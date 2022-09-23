@@ -6,7 +6,6 @@ class comb_reid:
     def __init__(self):
         st.header("재식별 데이터 디멘션 결합")
         files = st.file_uploader('결합할 재식별 데이터 업로드', accept_multiple_files=True, type="csv")
-        # files.sort(key=dimsort)
         file_list = list()
         if len(files) >= 2:
             files.sort(key=lambda x:x.name)

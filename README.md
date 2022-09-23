@@ -15,6 +15,7 @@ pip install joblib
 ```
 
 ### 업로드 데이터 limit 변경 방법
-.streamlit > config.toml
-[server]
-maxuploadsize = {}
+.streamlit > config.toml  
+
+`[server]  
+`maxuploadsize = [용량 입력]

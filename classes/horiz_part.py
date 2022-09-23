@@ -32,11 +32,11 @@ class horiz_part:
                 with st.form("drop select raw", clear_on_submit = True):
                     drop_raw_dict = dict()
                     drop_raw = list()
-                    for attr in raw_cols: #여기에 preprocess 된 칼럼 넣기
+                    for attr in raw_cols:
                         drop_raw_dict[attr] = st.checkbox(attr, key = attr + '_raw')
                     submitted_raw = st.form_submit_button("선택 완료")
             if submitted_raw:
-                for attr in raw_cols: #여기데도 칼럼
+                for attr in raw_cols:
                     if drop_raw_dict[attr]:
                         drop_raw.append(attr)
                 st.session_state.raw_chunk_drop += drop_raw
@@ -50,11 +50,11 @@ class horiz_part:
                 with st.form("drop select syn", clear_on_submit = True):
                     drop_syn_dict = dict()
                     drop_syn = list()
-                    for attr in syn_cols: # 속성
+                    for attr in syn_cols:
                         drop_syn_dict[attr] = st.checkbox(attr, key = attr + '_syn')
                     submitted_syn = st.form_submit_button("선택 완료")
             if submitted_syn:
-                for attr in syn_cols: #속성
+                for attr in syn_cols:
                     if drop_syn_dict[attr]:
                         drop_syn.append(attr)
                 st.session_state.syn_chunk_drop += drop_syn
@@ -82,28 +82,15 @@ class horiz_part:
                     st.session_state.syn_chunk = pd.read_csv(copy.deepcopy(split_syn_file), encoding='utf-8',skiprows=range(1,st.session_state.checked_rows+1), chunksize=st.session_state.div_num)
                     # 재현데이터 속성 읽기
                     st.session_state.chunk_col_num = pd.read_csv(copy.deepcopy(split_raw_file), encoding='utf-8', index_col=0, nrows=0).reset_index().columns.tolist()
-                    # should run a garabge collection here as well
-                    # if "chunk_no" in st.session_state:
-                        
-                    st.experimental_rerun() # 스크립트 재실행 하여야 "반복 실행 횟수"의 else 부분 작동
+                    st.experimental_rerun()
                 
 
-                # 재식별 데이터 저장 디렉토리 강제 생성
+                # 재식별 데이터 저장 디렉토리 생성
                 default_dir_path = str(Path.home()) + "/Desktop/Anonytest/"
                 self.synfile_dir_path = default_dir_path + str(split_syn_file.name)[:-4]
                 self.synfilename = str(split_syn_file.name)[:-4]
                 self.create_dirs(default_dir_path, self.synfile_dir_path)
-                # input_preview = st.empty()
 
-
-        # if "repeat_num" in st.session_state:
-        #     tab1, tab2 = st.tabs(["재식별도", "진행정보"])
-        #     with tab1:
-        #         self.syn_reid(split_raw_file)
-        #     with tab2:
-        #         self.progress_info()
-
-    # def syn_reid(self, raw_file):
         if "syn_chunk" in st.session_state:
             with st.form("reid_calc"):
                 col2_0, col2_1, col2_2, col2_3, col2_4 = st.columns([0.3, 5, 1, 20, 1])
@@ -115,7 +102,7 @@ class horiz_part:
             
             if start_button:
                 loop_count = 0
-                reid_collection = pd.DataFrame()#columns=st.session_state.chunk_col_num)
+                reid_collection = pd.DataFrame()
                 other_collection = ""
                 start_index = st.session_state.checked_rows+1
                 end_index = st.session_state.checked_rows+st.session_state.div_num
@@ -141,7 +128,7 @@ class horiz_part:
                 reid_file_path = self.synfile_dir_path + f'/p_{self.synfilename}_{st.session_state.checked_rows+1}_{end_index}.csv'
                 if reid_collection.empty:
                     st.info(f"재식별된 레코드가 없습니다!")
-                elif not os.path.exists(reid_file_path):
+                else:
                     with open(reid_file_path, 'w', encoding='utf-8-sig', newline='') as f:
                         reid_collection.to_csv(f)
                         st.info(f"재식별도 파일 다운로드 완료!  \n   {reid_file_path}")
