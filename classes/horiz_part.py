@@ -1,22 +1,14 @@
 #modules
-from itertools import count
 import os
 import streamlit as st
 import pandas as pd
 from pathlib import Path
-import json
-import sys
 import copy
 
 #functions
-from funcs.risk_syn import compute_risk
-from funcs.synthetic_reidentified import syn_reidentified_datas
-from funcs.similarity import similarity
 import funcs.utility as util
-import funcs.preprocessing as prep
 import funcs.horiz_util as horiz
 
-import timeit
 class horiz_part:
     def __init__(self):
 
@@ -28,10 +20,7 @@ class horiz_part:
 
         col2.markdown("#### 재현데이터")
         split_syn_file = col2.file_uploader("재현데이터 업로드", type="csv", key="syn_chunk_file")
-
-
-        
-
+       
         # 분할처리 위한 기타 파라미터 입력
         if (split_raw_file is not None) and (split_syn_file is not None):
             # 원본 속성 제거
@@ -107,14 +96,14 @@ class horiz_part:
                 # input_preview = st.empty()
 
 
-        if "repeat_num" in st.session_state:
-            tab1, tab2 = st.tabs(["재식별도", "진행정보"])
-            with tab1:
-                self.syn_reid(split_raw_file)
-            with tab2:
-                self.progress_info()
+        # if "repeat_num" in st.session_state:
+        #     tab1, tab2 = st.tabs(["재식별도", "진행정보"])
+        #     with tab1:
+        #         self.syn_reid(split_raw_file)
+        #     with tab2:
+        #         self.progress_info()
 
-    def syn_reid(self, raw_file):
+    # def syn_reid(self, raw_file):
         if "syn_chunk" in st.session_state:
             with st.form("reid_calc"):
                 col2_0, col2_1, col2_2, col2_3, col2_4 = st.columns([0.3, 5, 1, 20, 1])
@@ -124,18 +113,16 @@ class horiz_part:
 
                 start_button = col2_3.form_submit_button("재식별도 계산 시작")
             
-            
-            reidentified_res = st.container()
             if start_button:
                 loop_count = 0
-                reid_collection = pd.DataFrame(columns=st.session_state.chunk_col_num)
+                reid_collection = pd.DataFrame()#columns=st.session_state.chunk_col_num)
                 other_collection = ""
                 start_index = st.session_state.checked_rows+1
                 end_index = st.session_state.checked_rows+st.session_state.div_num
                 
                 #chunk 자체를 for loop 돌려야 chunk 별로 읽어짐
                 for chunk in st.session_state.syn_chunk:
-                    reid_chunk, risk_chunk, sim_chunk, = horiz.process_chunk(chunk, raw_file, dims, record_num)
+                    reid_chunk, risk_chunk, sim_chunk, = horiz.process_chunk(chunk, split_raw_file, dims, record_num)
                     chunk_metadata = (loop_count, start_index, end_index, st.session_state.div_num, len(reid_chunk), risk_chunk.iloc[0,0], sim_chunk.iloc[0,0])
                     reid_collection, other_collection = horiz.collect_chunk(reid_collection, other_collection, reid_chunk, chunk_metadata)
                     loop_count += 1

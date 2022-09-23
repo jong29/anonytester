@@ -13,3 +13,8 @@ pip install streamlit-option-menu
 pip install stqdm
 pip install joblib
 ```
+
+### 업로드 데이터 limit 변경 방법
+.streamlit > config.toml
+[server]
+maxuploadsize = {}
