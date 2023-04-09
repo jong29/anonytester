@@ -7,7 +7,7 @@ class main_UI:
             page_title = "Anony Tester",
             layout = "wide"
         )   
-        st.image(".\logo\logo2.png", width=500)
+        st.image(r".\\logo\\logo2.png", width=500)
         SideBar()
         
 if __name__ == '__main__':
